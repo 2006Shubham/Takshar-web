@@ -46,6 +46,8 @@ export const Feed = () => {
 
     const [feedData, setFeedData] = useState([]);
 
+    const [playingVideo, setPlayingVideo] = useState('');
+
 
     useEffect(() => {
 
@@ -157,27 +159,139 @@ export const Feed = () => {
                         </header>
 
                         {/* Video Section Container */}
-                        <div className="relative w-full aspect-video bg-gray-900 group cursor-pointer">
-                            {/* Thumbnail Image */}
-                            <img
-                                src={item.thumbnailUrl}
-                                alt={`Video for ${item.spark.topic}`}
-                                className="absolute inset-0 w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-300"
-                            />
+                        <div
+                            className="
+                                    relative
+                                    w-full
+                                    aspect-video
+                                    bg-black
+                                    cursor-pointer
+                                    "
+                        >
 
-                            {/* Centered Play Button Overlay */}
-                            <div className="absolute inset-0 flex items-center justify-center">
-                                <div className="rounded-full bg-white/20 backdrop-blur-sm p-3 md:p-4 group-hover:scale-110 group-hover:bg-orange-500/90 transition-all duration-300 shadow-lg">
-                                    <svg className="h-8 w-8 text-white translate-x-0.5" fill="currentColor" viewBox="0 0 24 24">
-                                        <path d="M8 5v14l11-7z" />
-                                    </svg>
-                                </div>
-                            </div>
+                            {
+                                playingVideo === item._id
 
-                            {/* Duration Badge */}
-                            <div className="absolute bottom-3 right-3 bg-black/70 backdrop-blur-md rounded px-2 py-1 text-xs font-medium text-white">
-                                {formatDuration(item.duration)}
-                            </div>
+                                    ?
+
+                                    <video
+
+                                        src={item.videoUrl}
+
+                                        controls
+
+                                        autoPlay
+
+                                        playsInline
+
+                                        className="
+    w-full
+    h-full
+    object-cover
+    "
+
+                                        onEnded={() =>
+                                            setPlayingVideo(null)
+                                        }
+
+                                    />
+
+                                    :
+
+                                    <>
+
+                                        <img
+
+                                            src={item.thumbnailUrl}
+
+                                            alt={item.spark.topic}
+
+                                            className="
+    absolute
+    inset-0
+    w-full
+    h-full
+    object-cover
+    "
+
+                                        />
+
+                                        <div
+
+                                            className="
+absolute
+inset-0
+flex
+items-center
+justify-center
+"
+
+                                        >
+
+                                            <button
+
+                                                onClick={() =>
+
+                                                    setPlayingVideo(
+                                                        item._id
+                                                    )
+
+                                                }
+
+                                                className="
+rounded-full
+bg-white/20
+backdrop-blur
+p-5
+hover:scale-110
+transition
+"
+
+                                            >
+
+                                                <svg
+                                                    className="
+w-10
+h-10
+text-white
+"
+                                                    fill="currentColor"
+                                                    viewBox="0 0 24 24"
+                                                >
+
+                                                    <path d="M8 5v14l11-7z" />
+
+                                                </svg>
+
+                                            </button>
+
+                                        </div>
+
+                                        <div
+                                            className="
+absolute
+bottom-3
+right-3
+bg-black/70
+text-white
+px-2
+py-1
+rounded
+"
+                                        >
+
+                                            {
+                                                formatDuration(
+                                                    item.duration
+                                                )
+                                            }
+
+                                        </div>
+
+                                    </>
+
+                            }
+
                         </div>
 
                         {/* Engagement Footer */}
