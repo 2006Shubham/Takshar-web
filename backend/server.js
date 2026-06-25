@@ -379,7 +379,7 @@ app.put('/api/completespark', async (req, res) => {
 
 })
 
-app.get('/api/getfeed', async (req, res) => {
+app.get('/api/getfeed', protect, async (req, res) => {
 
     try {
         const videos = await Video.find().populate({
@@ -398,18 +398,85 @@ app.get('/api/getfeed', async (req, res) => {
             ]
 
 
-        });
+        }).lean();
 
 
-        console.log(videos);
 
-        res.status(200).json({ videos });
+        const newVideos = videos.map((video) => {
+
+            return {
+
+                ...video,
+                isLikedByMe: video.likes.some(
+                    (userId) => userId.toString() === req.user._id.toString()
+                )
+
+            };
+
+        })
+
+
+        console.log(newVideos);
+
+        res.status(200).json({ newVideos });
 
 
     } catch (error) {
         console.log("cant send feed", error);
     }
 
+
+});
+
+// do like 
+
+app.put('/api/dolike', protect, async (req, res) => {
+
+    try {
+
+
+
+        const videoId = req.body.videoId;
+        console.log(videoId);
+
+        const video = await Video.findById(videoId);
+
+
+        if (!video) {
+            return res.status(404).json({
+                message: 'video not found'
+            });
+        }
+
+
+        const alreadyLiked = (video.likes || []).some(
+            id => id.toString() === req.user._id.toString()
+        );
+
+        if (alreadyLiked) {
+            video.likes.pull(
+                req.user._id
+            )
+        } else {
+            video.likes.addToSet(req.user._id);
+        }
+
+        const updatedVideo = await video.save();
+
+        updatedVideo.likedByMe = alreadyLiked;
+
+        updatedVideo.likesCount = updatedVideo.likes.length;
+
+        console.log(updatedVideo);
+
+        res.status(201).json({
+            updatedVideo
+        })
+
+
+    } catch (error) {
+        console.log("cant like", error)
+    }
 
 });
 

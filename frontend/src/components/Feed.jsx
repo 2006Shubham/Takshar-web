@@ -48,6 +48,7 @@ export const Feed = () => {
 
     const [playingVideo, setPlayingVideo] = useState('');
 
+    const [refetch, setRefetch] = useState(false);
 
     useEffect(() => {
 
@@ -59,18 +60,46 @@ export const Feed = () => {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json'
-                }
-
+                },
+                credentials: 'include'
             });
 
             const data = await response.json();
-            console.log(data.videos);
-            setFeedData(data.videos);
+            console.log(data.newVideos);
+            setFeedData(data.newVideos);
+            setRefetch(false);
 
         }
         fetchFeed();
 
-    }, []);
+    }, [refetch]);
+
+
+    async function doLike(id) {
+
+        try {
+
+            const response = await fetch("http://localhost:5000/api/dolike", {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+
+                credentials: 'include',
+
+                body: JSON.stringify({ videoId: id })
+            });
+            const data = await response.json();
+            console.log(data);
+
+            setRefetch(true);
+
+
+        } catch (error) {
+            console.log("Showing the error", error);
+        }
+
+    }
 
     function formatDuration(seconds) {
 
@@ -113,7 +142,7 @@ export const Feed = () => {
 
                 {feedData.map((item) => (
                     <article
-                        key={item.id}
+                        key={item._id}
                         className="rounded-2xl bg-white shadow-sm ring-1 ring-gray-200 overflow-hidden"
                     >
                         {/* Card Header: The "Spark" Interaction */}
@@ -296,11 +325,19 @@ rounded
 
                         {/* Engagement Footer */}
                         <footer className="px-4 py-3 sm:px-5 flex items-center gap-6 border-t border-gray-100 bg-gray-50/50">
-                            <button className="flex items-center gap-2 text-sm font-medium text-gray-600 hover:text-orange-600 transition-colors group">
-                                <svg className="h-5 w-5 text-gray-400 group-hover:text-orange-500 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5" />
-                                </svg>
-                                {item.likes}
+                            <button onClick={() => { doLike(item._id) }} className="flex items-center gap-2 text-sm font-medium text-gray-600 hover:text-orange-600 transition-colors group">
+                                {
+                                    item.isLikedByMe ?
+                                        <svg className="h-5 w-5 text-orange-400 group-hover:text-orange-500 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5" />
+                                        </svg>
+                                        :
+                                        <svg className="h-5 w-5 text-gray-400 group-hover:text-orange-500 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5" />
+                                        </svg>
+
+                                }
+                                {item.likes.length}
                             </button>
 
                             <button className="flex items-center gap-2 text-sm font-medium text-gray-600 hover:text-blue-600 transition-colors group">
