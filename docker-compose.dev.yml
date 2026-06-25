@@ -1,0 +1,22 @@
+
+services:
+  takshar_frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+
+  takshar_backend:
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+
+  takshar_mongo:
+    ports:
+      - "27017:27017"

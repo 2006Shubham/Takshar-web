@@ -4,7 +4,12 @@ const mongoose = require('mongoose');
 const User = require('./models/User');
 const Spark = require('./models/Spark')
 const Video = require('./models/Video')
-const env = require('dotenv').config();
+const path = require('path');
+// Try loading from backend/.env first, fall back to root .env if not found
+const env = require('dotenv').config({ path: path.resolve(__dirname, '.env') });
+if (!process.env.JWT_SECRET) {
+    require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
+}
 
 const jsonwebtoken = require('jsonwebtoken');
 
@@ -31,9 +36,10 @@ app.use(express.json());
 
 //connect to the mongo
 
-mongoose.connect('mongodb://localhost:27017/auth_project')
-    .then(() => console.log("Connected to local MongoDB successfully !"))
-    .catch((err) => console.error("Mongo Connection error"))
+const mongoURI = process.env.MONGODB_URI || 'mongodb://localhost:27017/auth_project';
+mongoose.connect(mongoURI)
+    .then(() => console.log(`Connected to MongoDB successfully! Database location: ${mongoURI.includes('mongodb+srv') ? 'Atlas Cloud' : 'Local Host'}`))
+    .catch((err) => console.error("Mongo Connection error:", err.message))
 
 app.get('/api/test', (req, res) => {
     res.json({
