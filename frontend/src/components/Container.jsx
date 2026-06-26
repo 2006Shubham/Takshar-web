@@ -1,7 +1,7 @@
 import { useState } from "react"
 import { Header } from "./Header"
-import { Feed } from "./Feed";
 import { SparkDashboard } from "./Spark/SparkDashboard";
+import { FeedLayout } from "./FeedLayout";
 
 export const Container = () => {
 
@@ -16,8 +16,13 @@ export const Container = () => {
     return (
         <>
             <Header onTabChange={handleTabChange} />
+            <div>
 
-            {tab === 'nav-home' && <Feed />}
+                {tab === 'nav-home' && <FeedLayout />
+                }
+
+            </div>
+
             {tab === 'nav-spark' && <SparkDashboard />}
 
         </>

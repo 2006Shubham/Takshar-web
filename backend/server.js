@@ -498,6 +498,28 @@ app.put('/api/dolike', protect, async (req, res) => {
 
 });
 
+app.get('/api/userprofile', protect, async (req, res) => {
+
+    const userId = req.user._id;
+    const user = await User.findById(userId)
+    const username = user.username;
+    const [sentCount, receivedCount] = await Promise.all([
+
+        Spark.countDocuments({ sender: userId }),
+        Spark.countDocuments({ to: userId })
+
+    ]);
+
+    console.log("!!!!!!!!!!!!Seent Count !!!!!!!!!!", sentCount);
+    console.log("!!!!!!!!!!!!Seent Count !!!!!!!!!!", receivedCount);
+    res.json({
+        sentCount,
+        receivedCount,
+        username
+    })
+
+});
+
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
 });

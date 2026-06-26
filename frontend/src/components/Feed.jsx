@@ -1,45 +1,6 @@
 
 import { useEffect } from 'react';
 import { useState } from 'react';
-/**
- * --- Dummy Data ---
- * Expected structure for a FeedItem:
- * { 
- * id: string, 
- * topic: string, 
- * initiator: { name: string, avatarUrl: string },
- * target: { name: string, avatarUrl: string },
- * thumbnailUrl: string,
- * metrics: { likes: number, comments: number }
- * }
- */
-const MOCK_FEED_DATA = [
-    {
-        id: 'spark-001',
-        topic: 'Explain React Server Components in 60s',
-        initiator: { name: 'Aryan', avatarUrl: 'https://i.pravatar.cc/150?u=aryan' },
-        target: { name: 'Rohan', avatarUrl: 'https://i.pravatar.cc/150?u=rohan' },
-        thumbnailUrl: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=800&q=80',
-        metrics: { likes: 342, comments: 28 },
-    },
-    {
-        id: 'spark-002',
-        topic: 'Walkthrough: LRU Cache Miss Rate Simulation',
-        initiator: { name: 'Sneha', avatarUrl: 'https://i.pravatar.cc/150?u=sneha' },
-        target: { name: 'Aryan', avatarUrl: 'https://i.pravatar.cc/150?u=aryan' },
-        thumbnailUrl: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=800&q=80',
-        metrics: { likes: 156, comments: 14 },
-    },
-    {
-        id: 'spark-003',
-        topic: 'Calculate Parity Bits in Hamming Code',
-        initiator: { name: 'Vikram', avatarUrl: 'https://i.pravatar.cc/150?u=vikram' },
-        target: { name: 'Priya', avatarUrl: 'https://i.pravatar.cc/150?u=priya' },
-        thumbnailUrl: 'https://images.unsplash.com/photo-1516116216624-53e697fedbea?auto=format&fit=crop&w=800&q=80',
-        metrics: { likes: 89, comments: 5 },
-    }
-];
-// ------------------
 
 export const Feed = () => {
 
@@ -136,7 +97,7 @@ export const Feed = () => {
 
 
     return (<>
-        <main className="min-h-screen bg-stone-50 py-8 px-4 sm:px-6">
+        <main className="min-h-screen bg-stone-50  px-4 sm:px-6">
             {/* Central feed container replacing the 500px padding */}
             <div className="mx-auto max-w-2xl flex flex-col gap-8">
 
