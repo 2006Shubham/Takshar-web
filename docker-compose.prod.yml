@@ -1,0 +1,9 @@
+
+services:
+  takshar_frontend:
+    ports:
+      - "3000:80"
+
+  takshar_backend:
+    ports:
+      - "5001:5000"

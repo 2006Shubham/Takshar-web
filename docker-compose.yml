@@ -1,0 +1,39 @@
+
+networks:
+  takshar_net:
+
+services:
+  takshar_mongo:
+    image: mongo:6
+    container_name: takshar_mongo
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: strongpassword
+      MONGO_INITDB_DATABASE: takshar_db
+    volumes:
+      - takshar_mongo_data:/data/db
+    networks:
+      - takshar_net
+
+  takshar_backend:
+    build: ./backend
+    container_name: takshar_backend
+    env_file:
+      - ./backend/.env
+    environment:
+      - MONGODB_URI=mongodb://admin:strongpassword@takshar_mongo:27017/takshar_db?authSource=admin
+    depends_on:
+      - takshar_mongo
+    networks:
+      - takshar_net
+
+  takshar_frontend:
+    build: ./frontend
+    container_name: takshar_frontend
+    depends_on:
+      - takshar_backend
+    networks:
+      - takshar_net
+
+volumes:
+  takshar_mongo_data:
