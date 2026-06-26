@@ -82,7 +82,7 @@ export const CreateSpark = () => {
             {/* Topic Input Field */}
             <div>
                 <label htmlFor="topic" className="block text-sm font-semibold leading-6 text-gray-900">
-                    What is the challenge topic?
+                    What is the <span className="text-orange-500">spark </span>topic?
                 </label>
                 <div className="mt-2">
                     <input

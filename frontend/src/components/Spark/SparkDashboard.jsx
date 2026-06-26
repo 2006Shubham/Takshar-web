@@ -17,76 +17,76 @@ export const SparkDashboard = () => {
 
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const fetchProfileData = async () => {
-      try {
-        const response = await fetch('http://localhost:5000/api/sparkdashboard', {
-          method: 'GET',
-          credentials: 'include'
-        });
+  // useEffect(() => {
+  //   const fetchProfileData = async () => {
+  //     try {
+  //       const response = await fetch('http://localhost:5000/api/sparkdashboard', {
+  //         method: 'GET',
+  //         credentials: 'include'
+  //       });
 
-        if (!response.ok) {
-          if (response.status === 401) navigate('/');
-          throw new Error('Network response was not ok');
-        }
+  //       if (!response.ok) {
+  //         if (response.status === 401) navigate('/');
+  //         throw new Error('Network response was not ok');
+  //       }
 
-        const data = await response.json();
+  //       const data = await response.json();
 
-        // --- THE DATA ADAPTER ---
-        const rawReceived = data.sparksReceived || [];
-        const rawSent = data.sparksSent || [];
+  //       // --- THE DATA ADAPTER ---
+  //       const rawReceived = data.sparksReceived || [];
+  //       const rawSent = data.sparksSent || [];
 
-        const formattedReceived = rawReceived.map(spark => ({
-          id: spark._id,
-          from: {
-            name: spark.sender?.username || 'Unknown Peer',
-            avatarUrl: `https://i.pravatar.cc/150?u=${spark.sender?._id}`
-          },
-          topic: spark.topic,
-          timestamp: spark.createdAt ? new Date(spark.createdAt).toLocaleDateString() : 'Recently',
-          status: spark.status.toLowerCase()
-        }));
+  //       const formattedReceived = rawReceived.map(spark => ({
+  //         id: spark._id,
+  //         from: {
+  //           name: spark.sender?.username || 'Unknown Peer',
+  //           avatarUrl: `https://i.pravatar.cc/150?u=${spark.sender?._id}`
+  //         },
+  //         topic: spark.topic,
+  //         timestamp: spark.createdAt ? new Date(spark.createdAt).toLocaleDateString() : 'Recently',
+  //         status: spark.status.toLowerCase()
+  //       }));
 
-        const formattedSent = rawSent.map(spark => ({
-          id: spark._id,
-          to: {
-            name: spark.to?.username || 'Unknown Peer',
-            avatarUrl: `https://i.pravatar.cc/150?u=${spark.to?._id}`
-          },
-          topic: spark.topic,
-          timestamp: spark.createdAt ? new Date(spark.createdAt).toLocaleDateString() : 'Recently',
-          status: spark.status.toLowerCase()
-        }));
+  //       const formattedSent = rawSent.map(spark => ({
+  //         id: spark._id,
+  //         to: {
+  //           name: spark.to?.username || 'Unknown Peer',
+  //           avatarUrl: `https://i.pravatar.cc/150?u=${spark.to?._id}`
+  //         },
+  //         topic: spark.topic,
+  //         timestamp: spark.createdAt ? new Date(spark.createdAt).toLocaleDateString() : 'Recently',
+  //         status: spark.status.toLowerCase()
+  //       }));
 
-        setUser(data.user);
-        setReceivedSparks(formattedReceived);
-        setSentSparks(formattedSent);
-        setIsLoading(false);
+  //       setUser(data.user);
+  //       setReceivedSparks(formattedReceived);
+  //       setSentSparks(formattedSent);
+  //       setIsLoading(false);
 
-      } catch (error) {
-        console.error("Authentication failed", error);
-        navigate('/');
-      }
-    };
+  //     } catch (error) {
+  //       console.error("Authentication failed", error);
+  //       navigate('/');
+  //     }
+  //   };
 
-    fetchProfileData();
-  }, [navigate]);
+  //   fetchProfileData();
+  // }, [navigate]);
 
 
-  if (loading) {
-    return (
-      <div style={{ textAlign: 'center', marginTop: '50px' }}>
-        <h2>Loading your dashboard...</h2>
-      </div>
-    );
-  }
+  // if (loading) {
+  //   return (
+  //     <div style={{ textAlign: 'center', marginTop: '50px' }}>
+  //       <h2>Loading your dashboard...</h2>
+  //     </div>
+  //   );
+  // }
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8 min-h-screen">
       <div className="mb-8 flex flex-col items-center sm:flex-row sm:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-gray-900">Spark Center</h1>
-          <p className="text-sm text-gray-500 mt-1">Challenge peers and track your progress.</p>
+          <p className="text-sm text-gray-500 mt-1">Spark peers and track your progress.</p>
         </div>
 
         <div className="flex space-x-1 rounded-xl bg-gray-100 p-1">
@@ -118,7 +118,7 @@ export const SparkDashboard = () => {
           />
         )}
 
-        {activeTab === 'sent' && <SentSparks sparks={sentSparks} />}
+        {activeTab === 'sent' && <SentSparks />}
       </div>
     </div>
   );
