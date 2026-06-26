@@ -3,7 +3,7 @@ networks:
 
 services:
   takshar_mongo:
-    image: mongo:6
+    image: mongo:latest # Using latest to prevent the version crash from earlier
     container_name: takshar_mongo
     environment:
       MONGO_INITDB_ROOT_USERNAME: admin
@@ -11,10 +11,10 @@ services:
       MONGO_INITDB_DATABASE: takshar_db
     volumes:
       - takshar_mongo_data:/data/db
+    ports:
+      - "27018:27017" # THIS is what allows Compass to see the data!
     networks:
       - takshar_net
-    ports:
-      - "27017:27017" 
 
   takshar_backend:
     build: ./backend
@@ -22,9 +22,10 @@ services:
     env_file:
       - ./backend/.env
     environment:
+      # Pointing back to the Docker container, not your local machine
       - MONGODB_URI=mongodb://admin:strongpassword@takshar_mongo:27017/takshar_db?authSource=admin
     ports:
-      - "5000:5000" 
+      - "5000:5000"
     depends_on:
       - takshar_mongo
     networks:
@@ -34,7 +35,7 @@ services:
     build: ./frontend
     container_name: takshar_frontend
     ports:
-      - "3000:80" 
+      - "8080:80"
     depends_on:
       - takshar_backend
     networks:
