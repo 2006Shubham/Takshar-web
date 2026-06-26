@@ -1,4 +1,3 @@
-
 networks:
   takshar_net:
 
@@ -14,6 +13,8 @@ services:
       - takshar_mongo_data:/data/db
     networks:
       - takshar_net
+    ports:
+      - "27017:27017" 
 
   takshar_backend:
     build: ./backend
@@ -22,6 +23,8 @@ services:
       - ./backend/.env
     environment:
       - MONGODB_URI=mongodb://admin:strongpassword@takshar_mongo:27017/takshar_db?authSource=admin
+    ports:
+      - "5000:5000" 
     depends_on:
       - takshar_mongo
     networks:
@@ -30,6 +33,8 @@ services:
   takshar_frontend:
     build: ./frontend
     container_name: takshar_frontend
+    ports:
+      - "3000:80" 
     depends_on:
       - takshar_backend
     networks:
