@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { formatRelativeTime } from '../../utils/dateUtils';
 
 export const SentSparks = () => {
 
@@ -51,7 +52,7 @@ export const SentSparks = () => {
               <p className="text-base font-bold text-gray-900 mt-1 leading-tight">{spark.topic}</p>
               <p className="text-xs text-gray-500 mt-2 flex items-center gap-1">
                 <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                Sent {spark.createdAt}
+                Sent {formatRelativeTime(spark.createdAt)}
               </p>
             </div>
           </div>

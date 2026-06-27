@@ -1,5 +1,5 @@
 
-import  { useState, useRef } from "react";
+import { useState, useRef } from "react";
 
 export const UploadVideo = ({ onClose, onUploadComplete }) => {
   // UI Interaction States
@@ -57,6 +57,12 @@ export const UploadVideo = ({ onClose, onUploadComplete }) => {
 
   // --- API Logic ---
   const handleUpload = async () => {
+
+    if(uploadState==='success'){
+      onclose();
+      return;
+    }
+
     if (!selectedFile) return;
 
     try {
@@ -95,6 +101,8 @@ export const UploadVideo = ({ onClose, onUploadComplete }) => {
       if (!uploadRes.ok) {
         throw new Error(data.error?.message || "Upload to cloud failed.");
       }
+
+      
 
       setUploadState("success");
 
@@ -154,10 +162,10 @@ export const UploadVideo = ({ onClose, onUploadComplete }) => {
           onDrop={handleDrop}
           onClick={() => fileInputRef.current?.click()}
           className={`relative mt-2 flex cursor-pointer justify-center rounded-xl border-2 border-dashed px-6 py-12 transition-all ${isDragging
-              ? "border-orange-500 bg-orange-50"
-              : selectedFile
-                ? "border-gray-300 bg-gray-50 hover:bg-gray-100"
-                : "border-gray-300 px-6 py-14 hover:border-orange-400 hover:bg-gray-50"
+            ? "border-orange-500 bg-orange-50"
+            : selectedFile
+              ? "border-gray-300 bg-gray-50 hover:bg-gray-100"
+              : "border-gray-300 px-6 py-14 hover:border-orange-400 hover:bg-gray-50"
             }`}
         >
           <input
@@ -211,7 +219,7 @@ export const UploadVideo = ({ onClose, onUploadComplete }) => {
           </button>
 
           <button
-            disabled={!selectedFile || uploadState === 'uploading' || uploadState === 'signing' || uploadState === 'success'}
+            disabled={!selectedFile || uploadState === 'uploading' || uploadState === 'signing'}
             onClick={handleUpload}
             className="inline-flex w-32 items-center justify-center rounded-xl bg-orange-600 px-3 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-orange-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-600 disabled:opacity-60 disabled:cursor-not-allowed transition-all"
           >

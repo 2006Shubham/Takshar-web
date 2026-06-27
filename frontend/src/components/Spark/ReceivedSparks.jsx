@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 
 import { UploadVideo } from "../UploadVideo";
+import { formatRelativeTime } from "../../utils/dateUtils";
 
 export const ReceivedSparks = () => {
 
@@ -36,6 +37,10 @@ export const ReceivedSparks = () => {
         body: JSON.stringify({ completeSparkSubmision: newVidio })
       });
 
+      if (response.ok) {
+        onStatusChange(completingSpark._id, 'success')
+      }
+
 
 
     } catch (error) {
@@ -45,7 +50,7 @@ export const ReceivedSparks = () => {
   }
 
 
-  function uploadVidio(spark) {
+  async function uploadVidio(spark) {
 
     setCompletingSpark(spark);
     setShowUpload(true);
@@ -144,7 +149,7 @@ export const ReceivedSparks = () => {
               <p className="text-base font-bold text-gray-900 mt-1 leading-tight">{spark.topic}</p>
               <p className="text-xs text-gray-500 mt-2 flex items-center gap-1">
                 <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                {spark.createdAt}
+                {formatRelativeTime(spark.createdAt)}
               </p>
             </div>
           </div>
@@ -172,8 +177,9 @@ export const ReceivedSparks = () => {
             {spark.status === 'accepted' && (
               <button
                 onClick={() => {
-                  onStatusChange(spark._id, 'success');
                   uploadVidio(spark);
+                  ;
+
                 }}
                 className="inline-flex items-center gap-2 text-sm font-medium text-white bg-orange-600 hover:bg-orange-500 px-4 py-2 rounded-lg shadow-sm transition-all"
               >
