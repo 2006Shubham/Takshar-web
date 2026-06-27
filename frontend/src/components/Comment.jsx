@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Replies } from './Replies';
 
 
 export const Comment = ({ videoId, onClose }) => {
@@ -6,6 +7,7 @@ export const Comment = ({ videoId, onClose }) => {
     const [newComment, setNewComment] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [userId, setUserId] = useState('');
+    const [activeCommentId, setActiveCommentId] = useState(null);
 
     useEffect(() => {
 
@@ -26,6 +28,11 @@ export const Comment = ({ videoId, onClose }) => {
         fetchComments();
     }, []);
 
+
+    const onReply = (commentId) => {
+        // If we click the same one, close it. Otherwise, set it as active.
+        setActiveCommentId(activeCommentId === commentId ? null : commentId);
+    };
 
     const handlePostComment = async (e) => {
         e.preventDefault();
@@ -205,8 +212,8 @@ export const Comment = ({ videoId, onClose }) => {
                                             {comment.likes.length > 0 && <span className={comment.isLikedByMe ? 'text-orange-600' : ''}>{comment.likes.length}</span>}
                                         </button>
 
-                                        <button className="text-xs font-semibold text-gray-500 hover:text-gray-900 transition-colors">
-                                            Reply
+                                        <button onClick={() => onReply(comment._id)} className="text-xs font-semibold text-gray-500 hover:text-gray-900 transition-colors">
+                                            Replies
                                         </button>
 
                                         {comment.repliesCount > 0 && (
@@ -214,7 +221,15 @@ export const Comment = ({ videoId, onClose }) => {
                                                 View {comment.repliesCount} replies
                                             </button>
                                         )}
+
+
                                     </div>
+
+                                    {
+                                        (activeCommentId === comment._id && <Replies parentId={comment._id}></Replies>)
+                                    }
+
+
 
                                 </div>
                             </div>
