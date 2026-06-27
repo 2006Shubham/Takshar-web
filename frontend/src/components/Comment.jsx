@@ -51,7 +51,8 @@ export const Comment = ({ videoId, onClose }) => {
 
             body: JSON.stringify({
                 text: newComment,
-                videoId: videoId
+                videoId: videoId,
+                parentId:null
             })
         });
 

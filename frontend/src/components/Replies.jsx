@@ -1,9 +1,5 @@
 import { useState, useEffect } from 'react';
-
-const INITIAL_REPLIES = [
-    { _id: 'r1', parentId: 'c1', text: 'This is a reply to comment c1', commenter: { username: 'Aman', avatar: 'https://i.pravatar.cc/150?u=aman' } },
-    { _id: 'r2', parentId: 'r1', text: 'This is a reply to reply r1', commenter: { username: 'Sneha', avatar: 'https://i.pravatar.cc/150?u=sneha' } },
-];
+import { formatRelativeTime } from '../utils/dateUtils';
 
 export const Replies = ({ parentId }) => {
     const [replies, setReplies] = useState([]);
@@ -12,24 +8,26 @@ export const Replies = ({ parentId }) => {
     const [isReplying, setIsReplying] = useState(false);
 
     useEffect(() => {
-        const data = INITIAL_REPLIES.filter(r => r.parentId === parentId);
-        setReplies(data);
+        // You are now hitting the same backend logic, just passing the parentId
+        fetch(`http://localhost:5000/api/fetchreplies?parentId=${parentId}`)
+            .then(res => res.json())
+            .then(data => setReplies(data));
     }, [parentId]);
 
-    const handlePostReply = (e) => {
+    const handlePostReply = async (e) => {
         e.preventDefault();
-        if (!newReply.trim()) return;
-
-        const newReplyObj = {
-            _id: Date.now().toString(),
-            parentId: parentId,
-            text: newReply,
-            commenter: { username: 'You', avatar: 'https://i.pravatar.cc/150?u=you' }
-        };
-
-        setReplies([...replies, newReplyObj]);
-        setNewReply('');
-        setIsReplying(false);
+        const response = await fetch("http://localhost:5000/api/postcomment", {
+            method: "POST",
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({
+                text: newReply,
+                parentId: parentId,// <--- This links it to the comment/reply
+                videoId: null
+            })
+        });
+        const savedReply = await response.json();
+        setReplies([...replies, savedReply]);
     };
 
     return (
@@ -80,11 +78,11 @@ export const Replies = ({ parentId }) => {
             {showReplies && replies.map((reply) => (
                 <div key={reply._id} className="group">
                     <div className="flex gap-3 items-start">
-                        <img src={reply.commenter.avatar} className="h-7 w-7 rounded-full shadow-sm" alt={reply.commenter.username} />
+                        <img src={reply.commenter.profileUrl} className="h-7 w-7 rounded-full shadow-sm" alt={reply.commenter.username} />
                         <div className="flex-1 bg-white hover:bg-gray-50 p-2 rounded-lg transition-colors">
                             <div className="flex items-baseline gap-2">
                                 <span className="text-xs font-bold text-gray-900">{reply.commenter.username}</span>
-                                <span className="text-[10px] text-gray-400">2h ago</span>
+                                <span className="text-[10px] text-gray-400">{formatRelativeTime(reply.createdAt)}</span>
                             </div>
                             <p className="text-sm text-gray-700 leading-snug mt-0.5">{reply.text}</p>
                         </div>

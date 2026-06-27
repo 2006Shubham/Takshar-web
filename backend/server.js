@@ -570,15 +570,16 @@ app.get('/api/userprofile', protect, async (req, res) => {
 app.post('/api/postcomment', protect, async (req, res) => {
 
     const userId = req.user._id;
-    const { text, videoId } = req.body;
+    const { text, videoId, parentId } = req.body;
 
 
 
     let newComment = new Comment({
 
-        commenter: userId,
-        videoId: videoId,
-        text: text,
+        text,
+        videoId: parentId ? null : videoId, // Keep videoId null if it's a reply
+        parentId: parentId || null,         // Keep parentId null if it's a main comment
+        commenter: userId
     });
 
 
@@ -594,8 +595,10 @@ app.get('/api/fetchcomments', protect, async (req, res) => {
 
     const { videoId } = req.query;
     const userId = req.user._id;
-    const comments = await Comment.find({ videoId: videoId })
-        .populate('commenter', 'username profileUrl').lean();
+    const comments = await Comment.find({ videoId: videoId, parentId: null })
+        .populate('commenter', 'username profileUrl').
+        sort({ createdAt: -1 }).
+        lean();
 
     const newComment = comments.map((comment) => {
 
@@ -610,10 +613,40 @@ app.get('/api/fetchcomments', protect, async (req, res) => {
     })
 
 
-    res.status(200).json({newComment:newComment, userId:userId});
+    res.status(200).json({ newComment: newComment, userId: userId });
 
 
 })
+
+
+// POST /api/postreply
+app.post('/api/postreply', protect, async (req, res) => {
+    const { text, parentId } = req.body;
+    try {
+        const newReply = await Comment.create({
+            text,
+            parentId,
+            commenter: req.user._id
+        });
+
+        // Populate the user data before sending back
+        const populatedReply = await Comment.findById(newReply._id)
+            .populate('commenter', 'username profileUrl');
+
+        res.status(201).json(populatedReply);
+    } catch (err) {
+        res.status(500).json({ error: "Failed to post reply" });
+    }
+});
+
+// GET /api/fetchreplies?parentId=...
+app.get('/api/fetchreplies', async (req, res) => {
+    const { parentId } = req.query;
+    const replies = await Comment.find({ parentId })
+        .populate('commenter', 'username profileUrl')
+        .sort({ createdAt: 1 });
+    res.json(replies);
+});
 
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
