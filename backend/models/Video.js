@@ -6,13 +6,13 @@ const videoSchema = new mongoose.Schema({
     owner: {
         type: mongoose.Schema.Types.ObjectId,
         required: true,
-        ref:'User'
+        ref: 'User'
     },
 
     spark: {
         type: mongoose.Schema.Types.ObjectId,
         required: true,
-        ref:'Spark'
+        ref: 'Spark'
     },
 
     videoUrl: {
@@ -22,34 +22,34 @@ const videoSchema = new mongoose.Schema({
 
     thumbnailUrl: {
         type: String,
-        default:''
+        default: ''
     }
 
     ,
     duration: {
         type: Number,
-        default :0
+        default: 0
     }
 
     ,
     likes: [{
 
-        type:mongoose.Schema.Types.ObjectId,
-        ref:'User'
-       
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+
     }]
     ,
 
-    views:{
-        type:Number,
-        default:0
+    views: {
+        type: Number,
+        default: 0
     },
-    
-    
-    
 
 
-},{timestamps:true});
+
+
+
+}, { timestamps: true });
 
 const Video = mongoose.model('Video', videoSchema);
 

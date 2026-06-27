@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const User = require('./models/User');
 const Spark = require('./models/Spark')
 const Video = require('./models/Video')
+const Comment = require('./models/Comment');
 const path = require('path');
 // Try loading from backend/.env first, fall back to root .env if not found
 const env = require('dotenv').config({ path: path.resolve(__dirname, '.env') });
@@ -519,6 +520,42 @@ app.get('/api/userprofile', protect, async (req, res) => {
     })
 
 });
+
+app.post('/api/postcomment', protect, async (req, res) => {
+
+    const userId = req.user._id;
+    const { text, videoId } = req.body;
+
+
+
+    let newComment = new Comment({
+
+        commenter: userId,
+        videoId: videoId,
+        text: text,
+    });
+
+
+
+    const savedComment = await newComment.save();
+
+    newComment = await Comment.findById(newComment._id).populate('commenter', 'username profileUrl');
+
+    res.status(201).json(newComment);
+});
+
+app.get('/api/fetchcomments', async (req, res) => {
+
+    const { videoId } = req.query;
+
+    const comments = await Comment.find({ videoId: videoId })
+        .populate('commenter', 'username profileUrl');
+
+
+    res.status(200).json(comments);
+
+
+})
 
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);

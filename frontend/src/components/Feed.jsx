@@ -1,7 +1,7 @@
 
 import { useEffect } from 'react';
 import { useState } from 'react';
-
+import { Comment } from './Comment';
 export const Feed = () => {
 
 
@@ -10,6 +10,12 @@ export const Feed = () => {
     const [playingVideo, setPlayingVideo] = useState('');
 
     const [refetch, setRefetch] = useState(false);
+
+    const [showCommentBox, setShowCommentBox] = useState(false);
+
+
+    const [commentOnVideo,setCommentOnVideo] = useState([]);
+
 
     useEffect(() => {
 
@@ -35,6 +41,11 @@ export const Feed = () => {
 
     }, [refetch]);
 
+
+    function handleOnClose() {
+        setShowCommentBox(false);
+    }
+
     const formatRelativeTime = (isoString) => {
         const date = new Date(isoString);
         const now = new Date();
@@ -59,6 +70,28 @@ export const Feed = () => {
         return "just now";
     };
 
+
+
+    async function doComment(id) {
+
+        setShowCommentBox(true);
+        setCommentOnVideo(id);
+
+
+        //api to fetch comments
+
+        // const response = await fetch("http://localhost:5000/api/docomment",{
+
+        //         methods:'GET',
+        //         headers:{
+        //                     'Content-Type':'application/json'
+        //         },
+        //         credentials:'include'
+        // })
+
+        // const data = await response.json();
+
+    }
 
 
 
@@ -201,10 +234,10 @@ export const Feed = () => {
                                         playsInline
 
                                         className="
-    w-full
-    h-full
-    object-cover
-    "
+                                        w-full
+                                        h-full
+                                        object-cover
+                                        "
 
                                         onEnded={() =>
                                             setPlayingVideo(null)
@@ -223,24 +256,24 @@ export const Feed = () => {
                                             alt={item.spark.topic}
 
                                             className="
-    absolute
-    inset-0
-    w-full
-    h-full
-    object-cover
-    "
+                                                            absolute
+                                                            inset-0
+                                                            w-full
+                                                            h-full
+                                                            object-cover
+                                                            "
 
                                         />
 
                                         <div
 
                                             className="
-absolute
-inset-0
-flex
-items-center
-justify-center
-"
+                                                        absolute
+                                                        inset-0
+                                                        flex
+                                                        items-center
+                                                        justify-center
+                                                        "
 
                                         >
 
@@ -255,13 +288,13 @@ justify-center
                                                 }
 
                                                 className="
-rounded-full
-bg-white/20
-backdrop-blur
-p-5
-hover:scale-110
-transition
-"
+                                                    rounded-full
+                                                    bg-white/20
+                                                    backdrop-blur
+                                                    p-5
+                                                    hover:scale-110
+                                                    transition
+                                                    "
 
                                             >
 
@@ -327,7 +360,7 @@ rounded
                                 {item.likes.length}
                             </button>
 
-                            <button className="flex items-center gap-2 text-sm font-medium text-gray-600 hover:text-blue-600 transition-colors group">
+                            <button onClick={() => doComment(item._id)} className="flex items-center gap-2 text-sm font-medium text-gray-600 hover:text-blue-600 transition-colors group">
                                 <svg className="h-5 w-5 text-gray-400 group-hover:text-blue-500 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                                 </svg>
@@ -342,6 +375,14 @@ rounded
                         </footer>
                     </article>
                 ))}
+
+
+                {
+                    showCommentBox &&
+                    (
+                        <Comment videoId ={commentOnVideo} onClose={handleOnClose} />
+                    )
+                }
 
             </div>
         </main>
