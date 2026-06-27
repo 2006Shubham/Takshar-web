@@ -1,45 +1,11 @@
 import { useState, useEffect } from 'react';
 
-/**
- * --- Dummy Data ---
- * Simulating data fetched based on the provided videoId
- */
-const MOCK_COMMENTS = [
-    {
-        id: 'c1',
-        user: { name: 'Sneha Desai', avatarUrl: 'https://i.pravatar.cc/150?u=sneha' },
-        text: 'This visual breakdown of the cache replacement policy is incredibly helpful. Did you use DineroIV for the simulation?',
-        timestamp: '2 hours ago',
-        likes: 14,
-        isLikedByMe: false,
-        repliesCount: 2,
-    },
-    {
-        id: 'c2',
-        user: { name: 'Vikram Patel', avatarUrl: 'https://i.pravatar.cc/150?u=vikram' },
-        text: 'Great explanation! I struggled with this during my OS exams. Would love to see a similar Spark on page fault algorithms.',
-        timestamp: '5 hours ago',
-        likes: 8,
-        isLikedByMe: true,
-        repliesCount: 0,
-    },
-    {
-        id: 'c3',
-        user: { name: 'Priya Singh', avatarUrl: 'https://i.pravatar.cc/150?u=priya' },
-        text: 'Could you share the GitHub repo for this specific implementation?',
-        timestamp: '1 day ago',
-        likes: 3,
-        isLikedByMe: false,
-        repliesCount: 1,
-    }
-];
 
 export const Comment = ({ videoId, onClose }) => {
     const [comments, setComments] = useState([]);
     const [newComment, setNewComment] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
-
-
+    const [userId, setUserId] = useState('');
 
     useEffect(() => {
 
@@ -52,11 +18,13 @@ export const Comment = ({ videoId, onClose }) => {
             });
             const data = await response.json();
 
-            setComments(data);
+            console.log(data.newComment);
+            setUserId(data.userId);
+            setComments(data.newComment);
 
         }
         fetchComments();
-    }, [videoId]);
+    }, []);
 
 
     const handlePostComment = async (e) => {
@@ -81,14 +49,60 @@ export const Comment = ({ videoId, onClose }) => {
         });
 
         const commentDone = await response.json();
-        //setNewComment(commentDone);
 
         setComments((prevComments) => [commentDone, ...prevComments]);
 
         setIsSubmitting(false);
 
 
+
+
     };
+
+
+    const doLikeComment = async (commentId) => {
+
+        try {
+
+            const response = await fetch("http://localhost:5000/api/dolikecomment", {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+
+                credentials: 'include',
+
+                body: JSON.stringify({ commentId: commentId })
+            });
+            const data = await response.json();
+            console.log(data);
+
+
+            setComments((prevComments) =>
+                prevComments.map((comment) => {
+                    if (comment._id === commentId) {
+                        const isNowLiked = !comment.isLikedByMe; // Toggle boolean
+
+                        return {
+                            ...comment,
+                            isLikedByMe: isNowLiked,
+
+                            likes: isNowLiked
+
+                                ? [...comment.likes, userId]
+
+                                : comment.likes.filter((id) => id.toString() !== userId.toString())
+                        };
+                    }
+                    return comment;
+                })
+            );
+
+        } catch (error) {
+            console.log("Showing the error", error);
+        }
+
+    }
 
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-stone-900/60 backdrop-blur-sm p-4 sm:p-6 transition-all">
@@ -173,10 +187,10 @@ export const Comment = ({ videoId, onClose }) => {
                                         </p>
                                     </div>
 
-                                    {/* Actions (Like / Reply)
+                                    {/* Actions (Like / Reply) */}
                                     <div className="mt-2 flex items-center gap-4 px-2">
                                         <button
-                                            onClick={() => handleToggleLike(comment._id)}
+                                            onClick={() => doLikeComment(comment._id)}
                                             className="flex items-center gap-1.5 text-xs font-semibold text-gray-500 hover:text-orange-600 transition-colors group"
                                         >
                                             <svg
@@ -200,7 +214,7 @@ export const Comment = ({ videoId, onClose }) => {
                                                 View {comment.repliesCount} replies
                                             </button>
                                         )}
-                                    </div> */}
+                                    </div>
 
                                 </div>
                             </div>

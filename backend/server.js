@@ -452,9 +452,6 @@ app.get('/api/getfeed', protect, async (req, res) => {
 app.put('/api/dolike', protect, async (req, res) => {
 
     try {
-
-
-
         const videoId = req.body.videoId;
         console.log(videoId);
 
@@ -490,6 +487,55 @@ app.put('/api/dolike', protect, async (req, res) => {
 
         res.status(201).json({
             updatedVideo
+        })
+
+
+    } catch (error) {
+        console.log("cant like", error)
+    }
+
+});
+
+
+app.put('/api/dolikecomment', protect, async (req, res) => {
+
+
+    try {
+        const commentId = req.body.commentId;
+        console.log(commentId);
+
+        const comment = await Comment.findById(commentId);
+
+
+        if (!comment) {
+            return res.status(404).json({
+                message: 'comment not found'
+            });
+        }
+
+
+        const alreadyLiked = (comment.likes || []).some(
+            id => id.toString() === req.user._id.toString()
+        );
+
+        if (alreadyLiked) {
+            comment.likes.pull(
+                req.user._id
+            )
+        } else {
+            comment.likes.addToSet(req.user._id);
+        }
+
+        const updatedComment = await comment.save();
+
+        updatedComment.likedByMe = alreadyLiked;
+
+        updatedComment.likesCount = updatedComment.likes.length;
+
+        console.log(updatedComment);
+
+        res.status(201).json({
+            updatedComment
         })
 
 
@@ -544,15 +590,27 @@ app.post('/api/postcomment', protect, async (req, res) => {
     res.status(201).json(newComment);
 });
 
-app.get('/api/fetchcomments', async (req, res) => {
+app.get('/api/fetchcomments', protect, async (req, res) => {
 
     const { videoId } = req.query;
-
+    const userId = req.user._id;
     const comments = await Comment.find({ videoId: videoId })
-        .populate('commenter', 'username profileUrl');
+        .populate('commenter', 'username profileUrl').lean();
+
+    const newComment = comments.map((comment) => {
+
+        return {
+            ...comment,
+            isLikedByMe: comment.likes.some(
+                (userId) => userId.toString() === req.user._id.toString()
+            )
+
+        };
+
+    })
 
 
-    res.status(200).json(comments);
+    res.status(200).json({newComment:newComment, userId:userId});
 
 
 })

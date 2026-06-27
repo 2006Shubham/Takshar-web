@@ -14,7 +14,7 @@ export const Feed = () => {
     const [showCommentBox, setShowCommentBox] = useState(false);
 
 
-    const [commentOnVideo,setCommentOnVideo] = useState([]);
+    const [commentOnVideo, setCommentOnVideo] = useState([]);
 
 
     useEffect(() => {
@@ -380,7 +380,7 @@ rounded
                 {
                     showCommentBox &&
                     (
-                        <Comment videoId ={commentOnVideo} onClose={handleOnClose} />
+                        <Comment videoId={commentOnVideo} onClose={handleOnClose} />
                     )
                 }
 
