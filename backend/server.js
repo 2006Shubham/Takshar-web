@@ -301,7 +301,7 @@ app.put('/api/changesparkstatus', async (req, res) => {
 
     const { newStatus, id } = req.body;
 
-    const updatedSpark = await Spark.findByIdAndUpdate(id, { status: newStatus }, { new: true });
+    const updatedSpark = await Spark.findByIdAndUpdate(id, { status: newStatus }, { new: true }).populate('sender', 'profileUrl username');
 
     console.log("frome ------update");
     console.log(updatedSpark);
