@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { formatRelativeTime } from '../utils/dateUtils';
 
-export const Replies = ({ parentId }) => {
+export const Replies = ({ parentId, parentCommentId }) => {
     const [replies, setReplies] = useState([]);
-    const [showReplies, setShowReplies] = useState(true);
+    const [showReplies, setShowReplies] = useState(false);
     const [newReply, setNewReply] = useState('');
     const [isReplying, setIsReplying] = useState(false);
 
@@ -28,12 +28,39 @@ export const Replies = ({ parentId }) => {
         });
         const savedReply = await response.json();
         setReplies([...replies, savedReply]);
+
+        setIsReplying(false)
+
     };
 
     return (
         <div className="ml-4 border-l border-gray-200 pl-4 mt-3 space-y-3">
             {/* Action Bar */}
             <div className="flex items-center gap-3">
+
+
+                {(!(parentCommentId === parentId) &&
+                    <button
+                        // onClick={() => doLikeComment(comment._id)}
+                        className="flex items-center gap-1.5 text-xs font-semibold text-gray-500 hover:text-orange-600 transition-colors group"
+                    >
+                        <svg
+                            // className={`h-4 w-4 transition-transform group-hover:scale-110 ${comment.isLikedByMe ? 'text-orange-500 fill-orange-500' : 'text-gray-400'}`}
+
+                            className={'h-4 w-4 transition-transform group-hover:scale-110 text-orange-500 fill-orange-500 text-gray-400'}
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                            strokeWidth={2}
+                        >
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                        </svg>
+                        {/* {comment.likes.length > 0 && <span className={comment.isLikedByMe ? 'text-orange-600' : ''}>{comment.likes.length}</span>} */}
+                    </button>
+                )}
+
+
+
                 {!isReplying && (
                     <button
                         onClick={() => setIsReplying(true)}
@@ -42,6 +69,7 @@ export const Replies = ({ parentId }) => {
                         Reply
                     </button>
                 )}
+
 
                 {replies.length > 0 && !isReplying && (
                     <button
@@ -68,7 +96,8 @@ export const Replies = ({ parentId }) => {
                         />
                         <div className="flex gap-2 mt-1 justify-end">
                             <button type="button" onClick={() => setIsReplying(false)} className="text-xs font-bold text-gray-400 hover:text-gray-600 px-3 py-1">Cancel</button>
-                            <button type="submit" className="text-xs font-bold bg-orange-600 text-white px-3 py-1 rounded-full hover:bg-orange-700 shadow-sm">Post</button>
+                            <button
+                                type="submit" className="text-xs font-bold bg-orange-600 text-white px-3 py-1 rounded-full hover:bg-orange-700 shadow-sm">Post</button>
                         </div>
                     </div>
                 </form>
@@ -88,7 +117,7 @@ export const Replies = ({ parentId }) => {
                         </div>
                     </div>
                     {/* Nested Recursion */}
-                    <Replies parentId={reply._id} />
+                    <Replies parentId={reply._id} parentCommentId={''} />
                 </div>
             ))}
         </div>

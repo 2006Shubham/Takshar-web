@@ -1,5 +1,4 @@
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
 
 // Import our new modular components
 import { CreateSpark } from './CreateSpark';
@@ -7,79 +6,7 @@ import { ReceivedSparks } from './ReceivedSparks';
 import { SentSparks } from './SentSparks';
 
 export const SparkDashboard = () => {
-  const [activeTab, setActiveTab] = useState('sent');
-
-  // Only Global State remains here
-  const [receivedSparks, setReceivedSparks] = useState([]);
-  const [sentSparks, setSentSparks] = useState([]);
-  const [user, setUser] = useState(null);
-  const [loading, setIsLoading] = useState(true);
-
-  const navigate = useNavigate();
-
-  // useEffect(() => {
-  //   const fetchProfileData = async () => {
-  //     try {
-  //       const response = await fetch('http://localhost:5000/api/sparkdashboard', {
-  //         method: 'GET',
-  //         credentials: 'include'
-  //       });
-
-  //       if (!response.ok) {
-  //         if (response.status === 401) navigate('/');
-  //         throw new Error('Network response was not ok');
-  //       }
-
-  //       const data = await response.json();
-
-  //       // --- THE DATA ADAPTER ---
-  //       const rawReceived = data.sparksReceived || [];
-  //       const rawSent = data.sparksSent || [];
-
-  //       const formattedReceived = rawReceived.map(spark => ({
-  //         id: spark._id,
-  //         from: {
-  //           name: spark.sender?.username || 'Unknown Peer',
-  //           avatarUrl: `https://i.pravatar.cc/150?u=${spark.sender?._id}`
-  //         },
-  //         topic: spark.topic,
-  //         timestamp: spark.createdAt ? new Date(spark.createdAt).toLocaleDateString() : 'Recently',
-  //         status: spark.status.toLowerCase()
-  //       }));
-
-  //       const formattedSent = rawSent.map(spark => ({
-  //         id: spark._id,
-  //         to: {
-  //           name: spark.to?.username || 'Unknown Peer',
-  //           avatarUrl: `https://i.pravatar.cc/150?u=${spark.to?._id}`
-  //         },
-  //         topic: spark.topic,
-  //         timestamp: spark.createdAt ? new Date(spark.createdAt).toLocaleDateString() : 'Recently',
-  //         status: spark.status.toLowerCase()
-  //       }));
-
-  //       setUser(data.user);
-  //       setReceivedSparks(formattedReceived);
-  //       setSentSparks(formattedSent);
-  //       setIsLoading(false);
-
-  //     } catch (error) {
-  //       console.error("Authentication failed", error);
-  //       navigate('/');
-  //     }
-  //   };
-
-  //   fetchProfileData();
-  // }, [navigate]);
-
-
-  // if (loading) {
-  //   return (
-  //     <div style={{ textAlign: 'center', marginTop: '50px' }}>
-  //       <h2>Loading your dashboard...</h2>
-  //     </div>
-  //   );
-  // }
+  const [activeTab, setActiveTab] = useState('create');
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8 min-h-screen">

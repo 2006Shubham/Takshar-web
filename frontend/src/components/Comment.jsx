@@ -52,7 +52,7 @@ export const Comment = ({ videoId, onClose }) => {
             body: JSON.stringify({
                 text: newComment,
                 videoId: videoId,
-                parentId:null
+                parentId: null
             })
         });
 
@@ -213,22 +213,14 @@ export const Comment = ({ videoId, onClose }) => {
                                             {comment.likes.length > 0 && <span className={comment.isLikedByMe ? 'text-orange-600' : ''}>{comment.likes.length}</span>}
                                         </button>
 
-                                        <button onClick={() => onReply(comment._id)} className="text-xs font-semibold text-gray-500 hover:text-gray-900 transition-colors">
-                                            Replies
-                                        </button>
-
-                                        {comment.repliesCount > 0 && (
-                                            <button className="text-xs font-semibold text-orange-600 hover:text-orange-700 transition-colors ml-auto">
-                                                View {comment.repliesCount} replies
-                                            </button>
-                                        )}
 
 
                                     </div>
 
-                                    {
-                                        (activeCommentId === comment._id && <Replies parentId={comment._id}></Replies>)
-                                    }
+
+
+                                    <Replies parentCommentId={comment._id} parentId={comment._id}></Replies>
+
 
 
 
