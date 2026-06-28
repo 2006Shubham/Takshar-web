@@ -1,15 +1,17 @@
-
 import { useState, useRef } from "react";
+import { useUpload } from "../context/UploadContext"; 
 
-export const UploadVideo = ({ onClose, onUploadComplete }) => {
+export const UploadVideo = ({ onClose, spark }) => {
   // UI Interaction States
   const [isDragging, setIsDragging] = useState(false);
-  const [uploadState, setUploadState] = useState("idle"); // idle | signing | uploading | success | error
   const [errorMessage, setErrorMessage] = useState("");
 
   // Data States
   const [selectedFile, setSelectedFile] = useState(null);
   const fileInputRef = useRef(null);
+
+  // Bring in the global upload function
+  const { startUpload } = useUpload();
 
   // --- Drag and Drop Handlers ---
   const handleDragOver = (e) => {
@@ -30,7 +32,6 @@ export const UploadVideo = ({ onClose, onUploadComplete }) => {
       const file = e.dataTransfer.files[0];
       if (file.type.startsWith("video/")) {
         setSelectedFile(file);
-        setUploadState("idle");
         setErrorMessage("");
       } else {
         setErrorMessage("Please select a valid video file.");
@@ -41,7 +42,6 @@ export const UploadVideo = ({ onClose, onUploadComplete }) => {
   const handleFileSelect = (e) => {
     if (e.target.files && e.target.files.length > 0) {
       setSelectedFile(e.target.files[0]);
-      setUploadState("idle");
       setErrorMessage("");
     }
   };
@@ -55,69 +55,18 @@ export const UploadVideo = ({ onClose, onUploadComplete }) => {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   };
 
-  // --- API Logic ---
-  const handleUpload = async () => {
-
-    if(uploadState==='success'){
-      onclose();
+  // --- Trigger Global Upload ---
+  const handleStartUpload = () => {
+    if (!selectedFile) {
+      setErrorMessage("Please select a video file to upload.");
       return;
     }
 
-    if (!selectedFile) return;
+    // 1. Pass the file and spark data to the background context
+    startUpload(selectedFile, spark);
 
-    try {
-      setUploadState("signing");
-      setErrorMessage("");
-
-      // 1. Get Signature
-      const signRes = await fetch("http://localhost:5000/api/uploadsignature", {
-        credentials: "include"
-      });
-
-      if (!signRes.ok) throw new Error("Failed to authenticate upload.");
-      const auth = await signRes.json();
-
-      // 2. Prepare Form Data
-      const fd = new FormData();
-      fd.append("file", selectedFile);
-      fd.append("timestamp", auth.timestamp);
-      fd.append("signature", auth.signature);
-      fd.append("api_key", auth.apiKey);
-      fd.append("folder", auth.folder);
-
-      setUploadState("uploading");
-
-      // 3. Upload to Cloudinary
-      const uploadRes = await fetch(
-        `https://api.cloudinary.com/v1_1/${auth.cloudName}/video/upload`,
-        {
-          method: "POST",
-          body: fd
-        }
-      );
-
-      const data = await uploadRes.json();
-
-      if (!uploadRes.ok) {
-        throw new Error(data.error?.message || "Upload to cloud failed.");
-      }
-
-      
-
-      setUploadState("success");
-
-      const thumbnailUrl = `https://res.cloudinary.com/${auth.cloudName}/video/upload/so_1/${data.public_id}.jpg`;
-
-
-      // Optional: trigger a callback to parent component with the secure_url
-      data.thumbnailUrl = thumbnailUrl;
-      onUploadComplete(data);
-
-    } catch (error) {
-      console.error(error);
-      setUploadState("error");
-      setErrorMessage(error.message || "An unexpected error occurred.");
-    }
+    // 2. Immediately close this modal so the user can interact with the app
+    onClose();
   };
 
   return (
@@ -140,18 +89,11 @@ export const UploadVideo = ({ onClose, onUploadComplete }) => {
           </button>
         </div>
 
-        {/* Status Banners */}
-        {uploadState === 'error' && (
+        {/* Error Banner */}
+        {errorMessage && (
           <div className="mb-4 rounded-lg bg-red-50 p-3 text-sm text-red-800 border border-red-200 flex items-center gap-2">
             <svg className="h-5 w-5 text-red-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z" clipRule="evenodd" /></svg>
             {errorMessage}
-          </div>
-        )}
-
-        {uploadState === 'success' && (
-          <div className="mb-4 rounded-lg bg-green-50 p-3 text-sm text-green-800 border border-green-200 flex items-center gap-2">
-            <svg className="h-5 w-5 text-green-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM16.707 5.293a1 1 0 00-1.414 0L9 11.586 4.707 7.293a1 1 0 00-1.414 1.414l5 5a1 1 0 001.414 0l8-8a1 1 0 000-1.414z" clipRule="evenodd" /></svg>
-            Video uploaded successfully!
           </div>
         )}
 
@@ -174,7 +116,6 @@ export const UploadVideo = ({ onClose, onUploadComplete }) => {
             className="hidden"
             ref={fileInputRef}
             onChange={handleFileSelect}
-            disabled={uploadState === 'uploading' || uploadState === 'signing'}
           />
 
           <div className="text-center">
@@ -187,9 +128,7 @@ export const UploadVideo = ({ onClose, onUploadComplete }) => {
                 </div>
                 <p className="text-sm font-semibold text-gray-900 truncate max-w-[200px] sm:max-w-xs">{selectedFile.name}</p>
                 <p className="text-xs text-gray-500 mt-1">{formatFileSize(selectedFile.size)}</p>
-                {uploadState === 'idle' && (
-                  <p className="text-xs text-orange-600 mt-3 font-medium hover:underline">Click to change file</p>
-                )}
+                <p className="text-xs text-orange-600 mt-3 font-medium hover:underline">Click to change file</p>
               </div>
             ) : (
               <>
@@ -219,23 +158,11 @@ export const UploadVideo = ({ onClose, onUploadComplete }) => {
           </button>
 
           <button
-            disabled={!selectedFile || uploadState === 'uploading' || uploadState === 'signing'}
-            onClick={handleUpload}
+            disabled={!selectedFile}
+            onClick={handleStartUpload}
             className="inline-flex w-32 items-center justify-center rounded-xl bg-orange-600 px-3 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-orange-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-600 disabled:opacity-60 disabled:cursor-not-allowed transition-all"
           >
-            {(uploadState === 'signing' || uploadState === 'uploading') ? (
-              <>
-                <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                {uploadState === 'signing' ? 'Preparing...' : 'Uploading...'}
-              </>
-            ) : uploadState === 'success' ? (
-              'Done'
-            ) : (
-              'Upload Video'
-            )}
+            Upload Video
           </button>
         </div>
 
@@ -243,4 +170,3 @@ export const UploadVideo = ({ onClose, onUploadComplete }) => {
     </div>
   );
 };
-

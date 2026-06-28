@@ -3,6 +3,8 @@ import { useState, useEffect } from "react";
 import { UploadVideo } from "../UploadVideo";
 import { formatRelativeTime } from "../../utils/dateUtils";
 
+import { useUpload } from "../../context/UploadContext"; // 
+
 export const ReceivedSparks = () => {
 
 
@@ -12,42 +14,29 @@ export const ReceivedSparks = () => {
 
   const [completingSpark, setCompletingSpark] = useState({});
 
-  async function saveVidioAndUrlToSpark(vidio) {
-
-    console.log("Vidio got in callbacl : ", vidio);
+  const { uploads } = useUpload();
 
 
-    const newVidio = {
-      secure_url: vidio.secure_url,
-      duration: vidio.duration,
-      spark: completingSpark,
-      owner: completingSpark.to,
-      thumbnailUrl: vidio.thumbnailUrl
-    }
+  useEffect(() => {
+    setReceivedSparks(prevSparks => {
+      let hasChanges = false;
 
-    console.log("Vidio  i created", newVidio);
-    try {
+      const nextSparks = prevSparks.map(spark => {
+        const activeUpload = uploads[spark._id];
 
-      const response = await fetch("http://localhost:5000/api/completespark", {
-
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ completeSparkSubmision: newVidio })
+        // If the background context says this spark's upload is a success, update it!
+        if (activeUpload && activeUpload.status === 'success' && spark.status !== 'success') {
+          hasChanges = true;
+          return { ...spark, status: 'success' };
+        }
+        return spark;
       });
 
-      if (response.ok) {
-        onStatusChange(completingSpark._id, 'success')
-      }
+      // Only trigger a re-render if a status actually changed
+      return hasChanges ? nextSparks : prevSparks;
+    });
+  }, [uploads]);
 
-
-
-    } catch (error) {
-      console.log("error  while storing the vidio submision", error);
-    }
-
-  }
 
 
   async function uploadVidio(spark) {
@@ -209,7 +198,7 @@ export const ReceivedSparks = () => {
 
       {showUpload && (
 
-        <UploadVideo onUploadComplete={saveVidioAndUrlToSpark} onClose={() => setShowUpload(false)} />
+        <UploadVideo spark={completingSpark} onClose={() => setShowUpload(false)} />
 
       )}
 

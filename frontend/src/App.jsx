@@ -2,19 +2,32 @@ import { Route, Routes } from "react-router-dom"
 import { SparkDashboard } from "./components/Spark/SparkDashboard"
 import AuthContainer from "./components/AuthContainer"
 import { Container } from "./components/Container"
-import { UploadVideo } from "./components/UploadVideo"
 import { TestApi } from "./components/TestApi"
 import { Comment } from "./components/Comment"
+
+// 1. Import your new Context Provider and Widget 
+// (Make sure to adjust these paths based on where you saved the files!)
+import { UploadProvider } from "./context/UploadContext"
+import { GlobalUploadManager } from "./components/GlobalUploadManager"
+
 function App() {
-
       return (
-            <Routes>
+            // 2. Wrap the entire app with the UploadProvider
+            <UploadProvider>
+                  {/* Added a relative wrapper to ensure the fixed widget positions correctly */}
+                  <div className="relative min-h-screen">
 
-                  <Route path="/" element={<AuthContainer />} />
-                  <Route path="/container" element={<Container />} />
-                  <Route path="/sparkdashboard" element={<SparkDashboard />} />
+                        <Routes>
+                              <Route path="/" element={<AuthContainer />} />
+                              <Route path="/container" element={<Container />} />
+                              <Route path="/sparkdashboard" element={<SparkDashboard />} />
+                        </Routes>
 
-            </Routes>
+                        {/* 3. Render the widget OUTSIDE the Routes */}
+                        <GlobalUploadManager />
+
+                  </div>
+            </UploadProvider>
       )
 }
 
