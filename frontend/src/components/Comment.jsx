@@ -1,18 +1,14 @@
 import { useState, useEffect } from 'react';
 import { Replies } from './Replies';
 
-
 export const Comment = ({ videoId, onClose }) => {
     const [comments, setComments] = useState([]);
     const [newComment, setNewComment] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [userId, setUserId] = useState('');
-    const [activeCommentId, setActiveCommentId] = useState(null);
 
     useEffect(() => {
-
         const fetchComments = async () => {
-
             const response = await fetch(`http://localhost:5000/api/fetchcomments?videoId=${videoId}`, {
                 method: 'GET',
                 headers: { 'Content-Type': 'application/json' },
@@ -20,19 +16,11 @@ export const Comment = ({ videoId, onClose }) => {
             });
             const data = await response.json();
 
-            console.log(data.newComment);
             setUserId(data.userId);
             setComments(data.newComment);
-
         }
         fetchComments();
-    }, []);
-
-
-    const onReply = (commentId) => {
-        // If we click the same one, close it. Otherwise, set it as active.
-        setActiveCommentId(activeCommentId === commentId ? null : commentId);
-    };
+    }, [videoId]);
 
     const handlePostComment = async (e) => {
         e.preventDefault();
@@ -40,15 +28,10 @@ export const Comment = ({ videoId, onClose }) => {
 
         setIsSubmitting(true);
 
-
-
         const response = await fetch("http://localhost:5000/api/postcomment", {
             method: "POST",
-            headers: {
-                'Content-Type': 'application/json'
-            },
+            headers: { 'Content-Type': 'application/json' },
             credentials: 'include',
-
             body: JSON.stringify({
                 text: newComment,
                 videoId: videoId,
@@ -57,75 +40,23 @@ export const Comment = ({ videoId, onClose }) => {
         });
 
         const commentDone = await response.json();
-
         setComments((prevComments) => [commentDone, ...prevComments]);
-
+        setNewComment('');
         setIsSubmitting(false);
-
-
-
-
     };
-
-
-    const doLikeComment = async (commentId) => {
-
-        try {
-
-            const response = await fetch("http://localhost:5000/api/dolikecomment", {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-
-                credentials: 'include',
-
-                body: JSON.stringify({ commentId: commentId })
-            });
-            const data = await response.json();
-            console.log(data);
-
-
-            setComments((prevComments) =>
-                prevComments.map((comment) => {
-                    if (comment._id === commentId) {
-                        const isNowLiked = !comment.isLikedByMe; // Toggle boolean
-
-                        return {
-                            ...comment,
-                            isLikedByMe: isNowLiked,
-
-                            likes: isNowLiked
-
-                                ? [...comment.likes, userId]
-
-                                : comment.likes.filter((id) => id.toString() !== userId.toString())
-                        };
-                    }
-                    return comment;
-                })
-            );
-
-        } catch (error) {
-            console.log("Showing the error", error);
-        }
-
-    }
 
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-stone-900/60 backdrop-blur-sm p-4 sm:p-6 transition-all">
-
-            {/* Modal Container */}
             <div className="relative flex w-full max-w-2xl max-h-[85vh] flex-col overflow-hidden rounded-2xl bg-white shadow-2xl animate-in fade-in zoom-in-95 duration-200">
 
                 {/* Sticky Header */}
-                <div className="flex items-center justify-between border-b border-gray-100 px-6 py-4 bg-white z-10">
+                <div className="flex items-center justify-between border-b border-gray-100 px-6 py-4 bg-white z-10 shrink-0">
                     <div>
                         <h2 className="text-lg font-bold text-gray-900">Comments</h2>
                         <p className="text-xs text-gray-500 font-medium mt-0.5">{comments.length} responses</p>
                     </div>
                     <button
-                        onClick={() => onClose()}
+                        onClick={onClose}
                         className="rounded-full p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-700 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-200"
                     >
                         <span className="sr-only">Close comments</span>
@@ -136,7 +67,7 @@ export const Comment = ({ videoId, onClose }) => {
                 </div>
 
                 {/* Input Area (Top) */}
-                <div className="border-b border-gray-100 bg-gray-50/50 px-6 py-4">
+                <div className="border-b border-gray-100 bg-gray-50/50 px-6 py-4 shrink-0">
                     <form onSubmit={handlePostComment} className="flex gap-4">
                         <img
                             src="https://i.pravatar.cc/150?u=takshar_demo"
@@ -178,58 +109,31 @@ export const Comment = ({ videoId, onClose }) => {
                         {comments.map((comment) => (
                             <div key={comment._id} className="flex gap-4">
                                 <img
-                                    src={comment.commenter.profileUrl}
-                                    alt={comment.commenter.username}
-                                    className="h-10 w-10 rounded-full object-cover mt-1"
+                                    src={comment.commenter?.profileUrl || 'https://i.pravatar.cc/150'}
+                                    alt={comment.commenter?.username || 'User'}
+                                    className="h-10 w-10 rounded-full object-cover mt-1 flex-shrink-0 shadow-sm"
                                 />
-                                <div className="flex-1">
+                                <div className="flex-1 min-w-0">
 
-                                    {/* Comment Bubble */}
-                                    <div className="rounded-2xl rounded-tl-none bg-gray-50 px-4 py-3">
+                                    {/* Top Level Comment Bubble */}
+                                    <div className="rounded-2xl rounded-tl-none bg-gray-50 px-4 py-3 hover:bg-gray-100 transition-colors">
                                         <div className="flex items-center justify-between mb-1">
-                                            <h4 className="text-sm font-bold text-gray-900">{comment.commenter.username}</h4>
-                                            <span className="text-xs font-medium text-gray-500">{comment.cretedAt}</span>
+                                            <h4 className="text-sm font-bold text-gray-900 truncate pr-2">{comment.commenter?.username}</h4>
+                                            <span className="text-xs font-medium text-gray-500 whitespace-nowrap">{comment.cretedAt}</span>
                                         </div>
-                                        <p className="text-sm text-gray-700 leading-relaxed">
+                                        <p className="text-sm text-gray-700 leading-relaxed break-words">
                                             {comment.text}
                                         </p>
                                     </div>
 
-                                    {/* Actions (Like / Reply) */}
-                                    <div className="mt-2 flex items-center gap-4 px-2">
-                                        <button
-                                            onClick={() => doLikeComment(comment._id)}
-                                            className="flex items-center gap-1.5 text-xs font-semibold text-gray-500 hover:text-orange-600 transition-colors group"
-                                        >
-                                            <svg
-                                                className={`h-4 w-4 transition-transform group-hover:scale-110 ${comment.isLikedByMe ? 'text-orange-500 fill-orange-500' : 'text-gray-400'}`}
-                                                fill="none"
-                                                viewBox="0 0 24 24"
-                                                stroke="currentColor"
-                                                strokeWidth={2}
-                                            >
-                                                <path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                                            </svg>
-                                            {comment.likes.length > 0 && <span className={comment.isLikedByMe ? 'text-orange-600' : ''}>{comment.likes.length}</span>}
-                                        </button>
-
-
-
-                                    </div>
-
-
-
-                                    <Replies parentCommentId={comment._id} parentId={comment._id}></Replies>
-
-
-
+                                    {/* Unified Action Bar + Recursion */}
+                                    <Replies parentEntity={comment} userId={userId} />
 
                                 </div>
                             </div>
                         ))}
                     </div>
                 </div>
-
             </div>
         </div>
     );
