@@ -3,6 +3,7 @@ import { Header } from "./Header"
 import { SparkDashboard } from "./Spark/SparkDashboard";
 import { FeedLayout } from "./FeedLayout";
 import { PeersNetwork } from "./PeersNetwork";
+import { Leaderboard } from "./LeaderBoard";
 
 export const Container = () => {
 
@@ -27,6 +28,8 @@ export const Container = () => {
             {tab === 'nav-spark' && <SparkDashboard />}
 
             {tab === 'nav-peers' && <PeersNetwork />}
+
+            {tab === 'nav-leaderboards' && <Leaderboard />}
 
 
 

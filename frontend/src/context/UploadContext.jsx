@@ -75,7 +75,8 @@ export const UploadProvider = ({ children }) => {
       const completeRes = await fetch("http://localhost:5000/api/completespark", {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ completeSparkSubmision: newVideo })
+        body: JSON.stringify({ completeSparkSubmision: newVideo }),
+        credentials: 'include'
       });
 
       // NEW: 4.5 Change the spark status in the database
@@ -86,8 +87,11 @@ export const UploadProvider = ({ children }) => {
           body: JSON.stringify({
             newStatus: 'success',
             id: uploadId
-          })
+          }),
+          credentials: 'include'
         });
+
+
       }
 
       // 5. Mark as complete in the global context

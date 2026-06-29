@@ -26,6 +26,9 @@ const userSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
     }],
+    currentStreak: { type: Number, default: 0 },
+    longestStreak: { type: Number, default: 0 },
+    lastSparkCompletedAt: { type: Date, default: null },
     createdAt: {
         type: Date,
         default: Date.now

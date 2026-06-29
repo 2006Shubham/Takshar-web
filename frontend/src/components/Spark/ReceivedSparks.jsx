@@ -92,12 +92,9 @@ export const ReceivedSparks = () => {
           newStatus: status,
           id: sparkid
 
-        })
-
-
-
+        }),
+        credentials: 'include'
       }
-
       )
 
 

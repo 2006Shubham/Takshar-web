@@ -7,6 +7,7 @@ const Video = require('./models/Video')
 const Comment = require('./models/Comment');
 const Connection = require('./models/Connection');
 const path = require('path');
+const { updateStreak } = require('./utils/streakUtils');
 // Try loading from backend/.env first, fall back to root .env if not found
 const env = require('dotenv').config({ path: path.resolve(__dirname, '.env') });
 if (!process.env.JWT_SECRET) {
@@ -296,7 +297,7 @@ app.get('/api/sparkdashboard', protect, async (req, res) => {
 
 //update the status of the sprak
 
-app.put('/api/changesparkstatus', async (req, res) => {
+app.put('/api/changesparkstatus', protect, async (req, res) => {
 
     console.log(req.body);
 
@@ -306,6 +307,11 @@ app.put('/api/changesparkstatus', async (req, res) => {
 
     console.log("frome ------update");
     console.log(updatedSpark);
+
+    if (newStatus === 'success') {
+        updateStreak(req.user._id);
+    }
+
     res.status(201).json({ updatedSpark });
 
 });
@@ -353,7 +359,7 @@ app.get('/api/uploadsignature', protect, (req, res) => {
 
 // completespark route
 
-app.put('/api/completespark', async (req, res) => {
+app.put('/api/completespark', protect, async (req, res) => {
 
     try {
         const video = req.body.completeSparkSubmision;
@@ -561,6 +567,28 @@ app.get('/api/userprofile', protect, async (req, res) => {
 
     ]);
 
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    let displayStreak = user.currentStreak;
+
+    if (user.lastSparkCompletedAt) {
+        const lastDate = new Date(user.lastSparkCompletedAt);
+        lastDate.setHours(0, 0, 0, 0);
+
+        const diffTime = today - lastDate;
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+        // If it's been more than 1 day since their last spark, their streak is dead.
+        if (diffDays > 1) {
+            displayStreak = 0;
+
+            User.updateOne({ _id: user._id }, { currentStreak: 0 }).exec();
+        }
+    }
+
+
+
     console.log("!!!!!!!!!!!!Seent Count !!!!!!!!!!", sentCount);
     console.log("!!!!!!!!!!!!Seent Count !!!!!!!!!!", receivedCount);
     res.json({
@@ -569,7 +597,8 @@ app.get('/api/userprofile', protect, async (req, res) => {
         username,
         peersCount,
         role,
-        profileUrl
+        profileUrl,
+        displayStreak
     })
 
 });
@@ -778,6 +807,58 @@ app.put('/api/network/respond', protect, async (req, res) => {
     } catch (error) {
         console.error("Error responding to connection:", error);
         res.status(500).json({ error: "Failed to process response." });
+    }
+});
+
+
+
+// GET /api/leaderboard
+app.get('/api/leaderboard', async (req, res) => {
+    try {
+        const leaderboard = await Spark.aggregate([
+            // 1. Only look at Sparks that were successfully completed
+            {
+                $match: { status: 'success' }
+            },
+            // 2. Group them by the receiver ('to') and count them up
+            {
+                $group: {
+                    _id: "$to",
+                    completedSparks: { $sum: 1 }
+                }
+            },
+            // 3. Sort by highest completed sparks first
+            {
+                $sort: { completedSparks: -1 }
+            },
+            // 4. "Populate" the user data (name and profile pic) from the Users collection
+            {
+                $lookup: {
+                    from: "users", // Must match your MongoDB collection name (usually lowercase plural)
+                    localField: "_id",
+                    foreignField: "_id",
+                    as: "userData"
+                }
+            },
+            // 5. Unwind the array created by $lookup
+            {
+                $unwind: "$userData"
+            },
+            // 6. Format the final output to match what the React component expects
+            {
+                $project: {
+                    _id: 1,
+                    completedSparks: 1,
+                    username: "$userData.username",
+                    profileUrl: "$userData.profileUrl"
+                }
+            }
+        ]);
+
+        res.status(200).json(leaderboard);
+    } catch (error) {
+        console.error("Leaderboard fetch error:", error);
+        res.status(500).json({ error: "Failed to fetch leaderboard" });
     }
 });
 
