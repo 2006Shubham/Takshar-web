@@ -118,7 +118,7 @@ export const PeersNetwork = () => {
         <div className="flex space-x-1 rounded-xl bg-gray-100 p-1">
           {[
             { id: 'discover', label: 'Discover' },
-            { id: 'connections', label: 'My Connections' },
+            { id: 'connections', label: 'My Peers' },
             { id: 'pending', label: 'Pending Requests' }
           ].map((tab) => (
             <button
