@@ -102,7 +102,7 @@ export const Replies = ({ parentEntity, userId, onLikeToggle }) => {
         <div className="mt-1.5 w-full">
 
             {/* UNIVERSAL ACTION BAR */}
-            <div className="flex items-center gap-4 px-2">
+            <div className="flex items-center justify-left gap-4 px-2">
 
                 <button
                     onClick={handleToggleLike}
@@ -130,7 +130,7 @@ export const Replies = ({ parentEntity, userId, onLikeToggle }) => {
                 {replies.length > 0 && (
                     <button
                         onClick={() => setShowReplies(!showReplies)}
-                        className="text-xs font-semibold text-orange-600 hover:text-orange-700 transition-colors ml-auto"
+                        className="text-xs font-semibold text-orange-600 hover:text-orange-700 transition-colors "
                     >
                         {showReplies ? "Hide replies" : `View ${replies.length} replies`}
                     </button>

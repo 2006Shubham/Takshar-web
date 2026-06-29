@@ -5,6 +5,7 @@ const User = require('./models/User');
 const Spark = require('./models/Spark')
 const Video = require('./models/Video')
 const Comment = require('./models/Comment');
+const Connection = require('./models/Connection');
 const path = require('path');
 // Try loading from backend/.env first, fall back to root .env if not found
 const env = require('dotenv').config({ path: path.resolve(__dirname, '.env') });
@@ -646,6 +647,123 @@ app.get('/api/fetchreplies', async (req, res) => {
         .populate('commenter', 'username profileUrl')
         .sort({ createdAt: 1 });
     res.json(replies);
+});
+
+//connect to peeers
+
+
+
+app.get('/api/network', protect, async (req, res) => {
+    try {
+        const userId = req.user.id; // From your auth middleware
+
+        // 1. Fetch ALL connections involving this user
+        const allConnections = await Connection.find({
+            $or: [{ from: userId }, { to: userId }]
+        }).populate('from to', 'username role profileUrl createdAt');
+
+        const connections = [];
+        const pendingReceived = [];
+        const pendingSent = [];
+        const excludedUserIds = [userId]; // We don't want to show the user themselves in 'Discover'
+
+        // 2. Categorize connections and track IDs to exclude from 'Discover'
+        allConnections.forEach(conn => {
+            // Figure out who the "other" person is
+            const isSender = conn.from._id.toString() === userId.toString();
+            const peer = isSender ? conn.to : conn.from;
+
+            excludedUserIds.push(peer._id.toString());
+
+            if (conn.status === 'Accepted') {
+                connections.push({ connectionId: conn._id, peer });
+            } else if (conn.status === 'Pending') {
+                if (isSender) pendingSent.push({ connectionId: conn._id, peer });
+                else pendingReceived.push({ connectionId: conn._id, peer });
+            }
+        });
+
+        // 3. Fetch Discover Pool (Everyone NOT in the excluded list)
+        const discoverPeers = await User.find({
+            _id: { $nin: excludedUserIds }
+        }).select('username role profileUrl createdAt');
+
+        res.status(200).json({
+            discover: discoverPeers,
+            connections,
+            pending: { received: pendingReceived, sent: pendingSent }
+        });
+
+    } catch (error) {
+        console.error("Network fetch error:", error);
+        res.status(500).json({ error: "Failed to load network data." });
+    }
+});
+
+// POST /api/network/connect
+app.post('/api/connect', protect, async (req, res) => {
+    try {
+        const { to } = req.body;
+        const from = req.user.id;
+
+        if (from === to) return res.status(400).json({ error: "Cannot connect to yourself." });
+
+        const existing = await Connection.findOne({
+            $or: [{ from, to }, { from: to, to: from }]
+        });
+
+        if (existing) return res.status(400).json({ error: "Connection already exists." });
+
+        const newConnection = await Connection.create({ from, to });
+
+        // Populate the 'to' user so the frontend can immediately add them to the 'Sent' tab
+        await newConnection.populate('to', 'username role profileUrl createdAt');
+
+        res.status(201).json(newConnection);
+    } catch (error) {
+        res.status(500).json({ error: "Failed to send request." });
+    }
+});
+
+
+
+// PUT /api/network/respond
+app.put('/api/network/respond', protect, async (req, res) => {
+    try {
+        const { connectionId, action } = req.body; // action will be 'Accepted' or 'Declined'
+        const userId = req.user.id;
+
+        // 1. Find the connection
+        const connection = await Connection.findById(connectionId);
+
+        if (!connection) {
+            return res.status(404).json({ error: "Connection request not found." });
+        }
+
+        // 2. Ensure only the recipient can accept or decline the request
+        if (connection.to.toString() !== userId.toString()) {
+            return res.status(403).json({ error: "Not authorized to respond to this request." });
+        }
+
+        // 3. Update the connection status
+        connection.status = action;
+        await connection.save();
+
+        // 4. If Accepted, update the 'peers' array in both User documents
+        if (action === 'Accepted') {
+            await User.findByIdAndUpdate(connection.from, {
+                $addToSet: { peers: connection.to }
+            });
+            await User.findByIdAndUpdate(connection.to, {
+                $addToSet: { peers: connection.from }
+            });
+        }
+
+        res.status(200).json({ message: `Connection ${action.toLowerCase()} successfully.`, connection });
+    } catch (error) {
+        console.error("Error responding to connection:", error);
+        res.status(500).json({ error: "Failed to process response." });
+    }
 });
 
 app.listen(PORT, () => {

@@ -21,3 +21,21 @@
         }
         return "just now";
     };
+
+
+
+    export const formatJoinDate = (isoString) => {
+    // 1. Check if the value is missing completely
+    if (!isoString) return "Unknown date";
+    
+    const date = new Date(isoString);
+    
+    // 2. Check if the value was passed but is an invalid date format
+    if (isNaN(date.getTime())) return "Unknown date";
+
+    // 3. Safely format the valid date
+    return new Intl.DateTimeFormat('en-US', { 
+        month: 'long', 
+        year: 'numeric' 
+    }).format(date);
+};
