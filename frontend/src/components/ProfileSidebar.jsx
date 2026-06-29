@@ -29,14 +29,14 @@ export const ProfileSidebar = () => {
 
             const userProfileData = {
                 name: data.username,
-                headline: "Computer Science & Engineering @ COEP Pune | Full-Stack Web Developer",
-                avatarUrl: "https://i.pravatar.cc/150?u=shubham",
+                headline: data.role,
+                avatarUrl:data.profileUrl,
                 bannerUrl: "https://images.unsplash.com/photo-1557683316-973673baf926?auto=format&fit=crop&w=400&q=80",
                 stats: {
                     sparksSent: data.sentCount,
                     sparksReceived: data.receivedCount,
                     streak: 5,
-                    peers: 112
+                    peers: data.peersCount
                 }
             }
 

@@ -551,6 +551,9 @@ app.get('/api/userprofile', protect, async (req, res) => {
     const userId = req.user._id;
     const user = await User.findById(userId)
     const username = user.username;
+    const role = user.role;
+    const profileUrl = user.profileUrl;
+    const peersCount = user.peers.length || 0;
     const [sentCount, receivedCount] = await Promise.all([
 
         Spark.countDocuments({ sender: userId }),
@@ -563,7 +566,10 @@ app.get('/api/userprofile', protect, async (req, res) => {
     res.json({
         sentCount,
         receivedCount,
-        username
+        username,
+        peersCount,
+        role,
+        profileUrl
     })
 
 });
