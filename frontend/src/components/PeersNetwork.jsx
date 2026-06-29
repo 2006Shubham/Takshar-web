@@ -1,58 +1,11 @@
 import { useState, useMemo, useEffect } from 'react';
 
-/**
- * --- Dummy Data ---
- * Using the exact schema provided.
- */
-const MOCK_USERS = [
-  {
-    id: 'u1',
-    username: 'shubham',
-    role: 'Spark Challenger',
-    profileUrl: 'https://i.pravatar.cc/150?u=shubham',
-    createdAt: '2026-06-26T07:43:15.245+00:00',
-    isConnected: true, // For demo purposes
-  },
-  {
-    id: 'u2',
-    username: 'sneha_dev',
-    role: 'Frontend Specialist',
-    profileUrl: 'https://i.pravatar.cc/150?u=sneha',
-    createdAt: '2026-01-15T10:20:00.000+00:00',
-    isConnected: false,
-  },
-  {
-    id: 'u3',
-    username: 'vikram_system',
-    role: 'Backend Architect',
-    profileUrl: 'https://i.pravatar.cc/150?u=vikram',
-    createdAt: '2025-11-05T08:12:30.000+00:00',
-    isConnected: true,
-  },
-  {
-    id: 'u4',
-    username: 'priya_ux',
-    role: 'UI/UX Designer',
-    profileUrl: 'https://i.pravatar.cc/150?u=priya',
-    createdAt: '2026-05-20T14:45:00.000+00:00',
-    isConnected: false,
-  },
-  {
-    id: 'u5',
-    username: 'aryan_codes',
-    role: 'Spark Challenger',
-    profileUrl: 'https://i.pravatar.cc/150?u=aryan',
-    createdAt: '2026-06-10T09:30:00.000+00:00',
-    isConnected: false,
-  }
-];
-// ------------------
-
 export const PeersNetwork = () => {
+  // Navigation & Search State
   const [activeTab, setActiveTab] = useState('discover'); // 'discover' | 'connections'
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Local state to handle interactive connections without a backend for now
+  // Data & Interaction States
   const [users, setUsers] = useState([]);
   const [pendingRequests, setPendingRequests] = useState(new Set());
 
@@ -60,7 +13,7 @@ export const PeersNetwork = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
-
+  // --- Data Fetching ---
   useEffect(() => {
     const fetchPeers = async () => {
       setIsLoading(true);
@@ -72,7 +25,6 @@ export const PeersNetwork = () => {
           headers: {
             'Content-Type': 'application/json'
           },
-
           credentials: 'include'
         });
 
@@ -80,11 +32,10 @@ export const PeersNetwork = () => {
           throw new Error(`Failed to fetch peers: ${response.statusText}`);
         }
 
-        const data = await response.json();
 
-        // Assuming your backend returns an array of user objects directly, 
-        // or something like { success: true, data: [...] }
-        setUsers(data.userlist || data);
+        const data = await response.json();
+        console.log(data.userlist);
+        setUsers(data.userlist || data || []);
 
       } catch (err) {
         console.error("Network error:", err);
@@ -97,50 +48,79 @@ export const PeersNetwork = () => {
     fetchPeers();
   }, []);
 
-  // Format the ISO date to a readable format (e.g., "Joined June 2026")
+  // --- Defensive Date Formatting ---
   const formatJoinDate = (isoString) => {
+    if (!isoString) return "Unknown date";
+
     const date = new Date(isoString);
-    return new Intl.DateTimeFormat('en-US', { month: 'long', year: 'numeric' }).format(date);
+    if (isNaN(date.getTime())) return "Unknown date";
+
+    return new Intl.DateTimeFormat('en-US', {
+      month: 'long',
+      year: 'numeric'
+    }).format(date);
   };
 
-  const handleConnect = (userId) => {
-    // Optimistic UI update: Set to pending
+  // --- Optimistic Network Actions ---
+  const handleConnect = async (userId) => {
+    // 1. Optimistic UI: Set button to loading/pending
     setPendingRequests((prev) => {
       const newSet = new Set(prev);
       newSet.add(userId);
       return newSet;
     });
 
-    // Simulate API call delay
-    setTimeout(() => {
+    try {
+      // In a real scenario, you would trigger the API here:
+      // await fetch('http://localhost:5000/api/connect', { ... })
+
+      // Simulating network delay
+      await new Promise(resolve => setTimeout(resolve, 800));
+
       setUsers((prevUsers) =>
         prevUsers.map(user =>
-          user._id === userId ? { ...user, isConnected: true } : user
+          user.id === userId || user._id === userId
+            ? { ...user, isConnected: true }
+            : user
         )
       );
+    } catch (error) {
+      console.error("Failed to connect", error);
+    } finally {
+      // Clear pending state
       setPendingRequests((prev) => {
         const newSet = new Set(prev);
         newSet.delete(userId);
         return newSet;
       });
-    }, 800);
+    }
   };
 
-  const handleRemoveConnection = (userId) => {
+  const handleRemoveConnection = async (userId) => {
+    // Optimistic UI update
     setUsers((prevUsers) =>
       prevUsers.map(user =>
-        user._id === userId ? { ...user, isConnected: false } : user
+        user.id === userId || user._id === userId
+          ? { ...user, isConnected: false }
+          : user
       )
     );
+    // Real scenario: await fetch('http://localhost:5000/api/disconnect', { ... })
   };
 
-  // Filter users based on active tab and search query
+  // --- Derived State for Rendering ---
   const displayedUsers = useMemo(() => {
+    if (!Array.isArray(users)) return [];
+
     return users.filter(user => {
       const matchesTab = activeTab === 'connections' ? user.isConnected : !user.isConnected;
 
-      const matchesSearch = user.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        user.role.toLowerCase().includes(searchQuery.toLowerCase());
+      const username = user.username || '';
+      const role = user.role || '';
+
+      const matchesSearch = username.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        role.toLowerCase().includes(searchQuery.toLowerCase());
+
       return matchesTab && matchesSearch;
     });
   }, [users, activeTab, searchQuery]);
@@ -195,9 +175,30 @@ export const PeersNetwork = () => {
         </div>
       </div>
 
-      {/* Grid Content Area */}
-      {displayedUsers.length === 0 ? (
-        <div className="flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-gray-200 bg-gray-50 py-16 px-6 text-center">
+      {/* Main Content Area */}
+      {isLoading ? (
+        <div className="flex flex-col items-center justify-center py-20 animate-in fade-in duration-500">
+          <svg className="animate-spin h-10 w-10 text-orange-500 mb-4" fill="none" viewBox="0 0 24 24">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          <p className="text-sm font-medium text-gray-500">Loading network...</p>
+        </div>
+      ) : error ? (
+        <div className="rounded-2xl bg-red-50 p-6 border border-red-100 text-center max-w-2xl mx-auto animate-in fade-in duration-300">
+          <svg className="mx-auto h-8 w-8 text-red-400 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+          </svg>
+          <p className="text-sm font-semibold text-red-800">{error}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="mt-4 inline-flex items-center text-sm font-medium text-red-600 hover:text-red-500 transition-colors"
+          >
+            Refresh Page
+          </button>
+        </div>
+      ) : displayedUsers.length === 0 ? (
+        <div className="flex flex-col items-center justify-center rounded-3xl border-2 border-dashed border-gray-200 bg-gray-50/50 py-20 px-6 text-center animate-in fade-in duration-500">
           <svg className="mx-auto h-12 w-12 text-gray-300 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
           </svg>
@@ -212,66 +213,70 @@ export const PeersNetwork = () => {
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 animate-in fade-in duration-500">
-          {displayedUsers.map((user) => (
-            <div
-              key={user._id}
-              className="group flex flex-col rounded-2xl bg-white p-6 shadow-sm ring-1 ring-gray-200 hover:-translate-y-1 hover:shadow-md transition-all duration-300"
-            >
-              {/* Card Header: Avatar & Info */}
-              <div className="flex flex-col items-center text-center">
-                <img
-                  src={user.profileUrl}
-                  alt={user.username}
-                  className="h-20 w-20 rounded-full object-cover ring-4 ring-gray-50 shadow-sm"
-                />
-                <h3 className="mt-4 text-base font-bold text-gray-900 tracking-tight">@{user.username}</h3>
-                <span className="mt-1 inline-flex items-center rounded-full bg-orange-50 px-2.5 py-0.5 text-xs font-semibold text-orange-700 ring-1 ring-inset ring-orange-600/20">
-                  {user.role}
-                </span>
-                <p className="mt-3 text-xs font-medium text-gray-500">
-                  Joined at {formatJoinDate(user.createdAt)}
-                </p>
-              </div>
+          {displayedUsers.map((user) => {
+            const userId = user.id || user._id; // Accommodate different DB ID fields
 
-              {/* Card Footer: Actions */}
-              <div className="mt-6 flex-1 flex flex-col justify-end">
-                {user.isConnected ? (
-                  <div className="flex items-center gap-2">
-                    <button className="flex-1 rounded-xl bg-gray-50 px-3 py-2 text-sm font-semibold text-gray-700 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-100 transition-colors">
-                      Message
-                    </button>
+            return (
+              <div
+                key={userId}
+                className="group flex flex-col rounded-3xl bg-white p-6 shadow-sm ring-1 ring-gray-200 hover:-translate-y-1 hover:shadow-md transition-all duration-300"
+              >
+                {/* Card Header: Avatar & Info */}
+                <div className="flex flex-col items-center text-center">
+                  <img
+                    src={user.profileUrl || 'https://i.pravatar.cc/150?u=fallback'}
+                    alt={user.username}
+                    className="h-20 w-20 rounded-full object-cover ring-4 ring-gray-50 shadow-sm"
+                  />
+                  <h3 className="mt-4 text-base font-bold text-gray-900 tracking-tight">@{user.username}</h3>
+                  <span className="mt-1 inline-flex items-center rounded-full bg-orange-50 px-2.5 py-0.5 text-xs font-semibold text-orange-700 ring-1 ring-inset ring-orange-600/20">
+                    {user.role || 'Member'}
+                  </span>
+                  <p className="mt-3 text-xs font-medium text-gray-500">
+                    Joined {formatJoinDate(user.createdAt)}
+                  </p>
+                </div>
+
+                {/* Card Footer: Actions */}
+                <div className="mt-6 flex-1 flex flex-col justify-end">
+                  {user.isConnected ? (
+                    <div className="flex items-center gap-2">
+                      <button className="flex-1 rounded-xl bg-gray-50 px-3 py-2 text-sm font-semibold text-gray-700 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-100 transition-colors">
+                        Message
+                      </button>
+                      <button
+                        onClick={() => handleRemoveConnection(userId)}
+                        className="rounded-xl p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors focus:outline-none"
+                        title="Remove Connection"
+                      >
+                        <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7a4 4 0 11-8 0 4 4 0 018 0zM9 14a6 6 0 00-6 6v1h12v-1a6 6 0 00-6-6zM21 12h-6" />
+                        </svg>
+                      </button>
+                    </div>
+                  ) : (
                     <button
-                      onClick={() => handleRemoveConnection(user.id)}
-                      className="rounded-xl p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors focus:outline-none"
-                      title="Remove Connection"
+                      onClick={() => handleConnect(userId)}
+                      disabled={pendingRequests.has(userId)}
+                      className={`w-full rounded-xl px-3 py-2 text-sm font-semibold shadow-sm transition-all flex justify-center items-center gap-2 ${pendingRequests.has(userId)
+                        ? 'bg-orange-100 text-orange-700 cursor-not-allowed'
+                        : 'bg-orange-600 text-white hover:bg-orange-500'
+                        }`}
                     >
-                      <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7a4 4 0 11-8 0 4 4 0 018 0zM9 14a6 6 0 00-6 6v1h12v-1a6 6 0 00-6-6zM21 12h-6" />
-                      </svg>
+                      {pendingRequests.has(userId) ? (
+                        <>
+                          <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                          Connecting...
+                        </>
+                      ) : (
+                        'Connect'
+                      )}
                     </button>
-                  </div>
-                ) : (
-                  <button
-                    onClick={() => handleConnect(user._id)}
-                    disabled={pendingRequests.has(user._id)}
-                    className={`w-full rounded-xl px-3 py-2 text-sm font-semibold shadow-sm transition-all flex justify-center items-center gap-2 ${pendingRequests.has(user._id)
-                      ? 'bg-orange-100 text-orange-700 cursor-not-allowed'
-                      : 'bg-orange-600 text-white hover:bg-orange-500'
-                      }`}
-                  >
-                    {pendingRequests.has(user._id) ? (
-                      <>
-                        <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                        Connecting...
-                      </>
-                    ) : (
-                      'Connect'
-                    )}
-                  </button>
-                )}
+                  )}
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>

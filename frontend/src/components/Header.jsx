@@ -9,7 +9,7 @@ import { useState } from 'react';
 const NAV_ITEMS = [
   { id: 'nav-home', label: 'Home', href: '#', isActive: true },
   { id: 'nav-spark', label: 'Spark', href: '#', isActive: true },
-  { id: 'nav-friends', label: 'Friends', href: '#', isActive: true },
+  { id: 'nav-peers', label: 'peers', href: '#', isActive: true },
   { id: 'nav-leaderboards', label: 'Leaderboards', href: '#', isActive: true },
 ];
 

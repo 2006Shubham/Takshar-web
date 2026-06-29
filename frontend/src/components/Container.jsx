@@ -2,6 +2,7 @@ import { useState } from "react"
 import { Header } from "./Header"
 import { SparkDashboard } from "./Spark/SparkDashboard";
 import { FeedLayout } from "./FeedLayout";
+import { PeersNetwork } from "./PeersNetwork";
 
 export const Container = () => {
 
@@ -24,6 +25,10 @@ export const Container = () => {
             </div>
 
             {tab === 'nav-spark' && <SparkDashboard />}
+
+            {tab === 'nav-peers' && <PeersNetwork />}
+
+
 
         </>
     )

@@ -22,7 +22,7 @@ const sparkSchema = new mongoose.Schema({
     ,
     status: {
         type: String,
-        enum: ['Pending', 'Accepted', 'Declined', 'Completed'],
+
         default: 'Pending'
     },
 
