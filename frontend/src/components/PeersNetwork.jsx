@@ -48,6 +48,9 @@ export const PeersNetwork = () => {
     // If accepted, immediately push it to the "My Connections" tab
     if (action === 'Accepted') {
       setConnections(prev => [requestToProcess, ...prev]);
+    } else if (action === 'Declined') {
+      //Instantly put the user back into the Discover pool!
+      setDiscover(prev => [requestToProcess.peer, ...prev]);
     }
 
     // 3. Network Call
@@ -66,6 +69,8 @@ export const PeersNetwork = () => {
       // If it fails, revert the UI by putting them back in the pending list
       if (action === 'Accepted') {
         setConnections(prev => prev.filter(conn => conn.connectionId !== connectionId));
+      } else if (action === 'Declined') {
+        setDiscover(prev => prev.filter(peer => peer._id !== requestToProcess.peer._id));
       }
       setPending(prev => ({
         ...prev,

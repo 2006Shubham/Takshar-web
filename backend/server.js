@@ -733,10 +733,10 @@ app.post('/api/connect', protect, async (req, res) => {
 
 
 
-// PUT /api/network/respond
+/// PUT /api/network/respond
 app.put('/api/network/respond', protect, async (req, res) => {
     try {
-        const { connectionId, action } = req.body; // action will be 'Accepted' or 'Declined'
+        const { connectionId, action } = req.body; // 'Accepted' or 'Declined'
         const userId = req.user.id;
 
         // 1. Find the connection
@@ -746,26 +746,35 @@ app.put('/api/network/respond', protect, async (req, res) => {
             return res.status(404).json({ error: "Connection request not found." });
         }
 
-        // 2. Ensure only the recipient can accept or decline the request
+        // 2. Ensure only the recipient can respond
         if (connection.to.toString() !== userId.toString()) {
             return res.status(403).json({ error: "Not authorized to respond to this request." });
         }
 
-        // 3. Update the connection status
-        connection.status = action;
-        await connection.save();
-
-        // 4. If Accepted, update the 'peers' array in both User documents
+        // 3. Process action
         if (action === 'Accepted') {
+            connection.status = 'Accepted';
+            await connection.save();
+
+            // Update both users' peer arrays
             await User.findByIdAndUpdate(connection.from, {
                 $addToSet: { peers: connection.to }
             });
             await User.findByIdAndUpdate(connection.to, {
                 $addToSet: { peers: connection.from }
             });
+
+            return res.status(200).json({ message: "Connection accepted successfully.", connection });
+
+        } else if (action === 'Declined') {
+            //  Delete the dead record entirely so they can discover each other again
+            await Connection.findByIdAndDelete(connectionId);
+
+            return res.status(200).json({ message: "Connection declined and removed." });
+        } else {
+            return res.status(400).json({ error: "Invalid action." });
         }
 
-        res.status(200).json({ message: `Connection ${action.toLowerCase()} successfully.`, connection });
     } catch (error) {
         console.error("Error responding to connection:", error);
         res.status(500).json({ error: "Failed to process response." });
