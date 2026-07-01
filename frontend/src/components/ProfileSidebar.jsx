@@ -1,62 +1,15 @@
-import { useEffect } from "react";
-import { useState } from "react";
+import React from "react";
+import { useUser } from '../context/UserContext';
 
 export const ProfileSidebar = () => {
+    // Tap into the global context
+    const { userProfileData, isLoading } = useUser();
 
-
-    const [userProfileData, setUserProfileData] = useState(null);
-
-    useEffect(() => {
-
-
-        const fetchUserProfileData = async () => {
-
-
-            const response = await fetch("http://localhost:5000/api/userprofile", {
-
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-                ,
-                credentials: 'include'
-
-            });
-
-            const data = await response.json();
-
-            console.log(data);
-
-            const userProfileData = {
-                name: data.username,
-                headline: data.role,
-                avatarUrl: data.profileUrl,
-                bannerUrl: "https://images.unsplash.com/photo-1557683316-973673baf926?auto=format&fit=crop&w=400&q=80",
-                stats: {
-                    sparksSent: data.sentCount,
-                    sparksReceived: data.receivedCount,
-                    streak: data.displayStreak,
-                    peers: data.peersCount
-                },
-
-            }
-
-            setUserProfileData(userProfileData);
-
-
-
-
-        }
-        fetchUserProfileData();
-
-    }, [])
-
-    if (!userProfileData) {
-        return <div className="p-4">Loading your profile...</div>;
+    if (isLoading || !userProfileData) {
+        return <div className="p-4 text-sm text-gray-500 font-medium">Loading your profile...</div>;
     }
 
     return (
-
         <div className="sticky top-20 flex flex-col overflow-hidden rounded-xl bg-white shadow-sm ring-1 ring-gray-200">
 
             {/* Banner Image */}
@@ -66,7 +19,6 @@ export const ProfileSidebar = () => {
             />
 
             {/* Avatar & Info */}
-
             <div className="relative px-4 pb-4 flex flex-col items-start sm:items-center justify-start sm:px-6">
                 <div className="-mt-10 mb-2 rounded-full bg-white p-1 ring-1 ring-gray-200">
                     <img
@@ -98,7 +50,6 @@ export const ProfileSidebar = () => {
                     <li className="flex items-center justify-between group cursor-pointer">
                         <span className="font-medium text-gray-500 group-hover:text-gray-900 transition-colors">Current Streak</span>
                         <div className="flex items-center gap-1 font-bold text-orange-600">
-
                             {userProfileData.stats.streak} Days
                         </div>
                     </li>
@@ -108,7 +59,6 @@ export const ProfileSidebar = () => {
                     </li>
                 </ul>
             </div>
-
         </div>
     );
 };

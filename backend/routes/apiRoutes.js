@@ -15,6 +15,7 @@ const { protect } = require('../middleware/authMiddleware');
 // 1. Auth routes
 router.post('/signup', authController.signup);
 router.post('/login', authController.login);
+router.post('/logout', authController.logout);
 
 // 2. User routes
 router.get('/users', protect, userController.getUsers);

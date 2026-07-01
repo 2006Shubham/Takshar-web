@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { ProfileDropdown } from './ProfileDropDown';
 
 /**
  * --- Dummy Data ---
@@ -86,13 +87,8 @@ export const Header = ({ onTabChange }) => {
               )}
             </button>
 
-            <button className="flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-orange-500 rounded-full p-0.5">
-              <img
-                className="h-8 w-8 rounded-full object-cover shadow-sm ring-1 ring-gray-200"
-                src={MOCK_USER.avatarUrl}
-                alt={`${MOCK_USER.name}'s profile`}
-              />
-            </button>
+          
+            <ProfileDropdown/>
           </div>
         </div>
 

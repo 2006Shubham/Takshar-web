@@ -1,5 +1,5 @@
 const jsonwebtoken = require('jsonwebtoken');
-const User = require('../models/User'); // Adjust this path to wherever your Mongoose model is
+const User = require('../models/User'); 
 
 const protect = async (req, res, next) => {
     try {

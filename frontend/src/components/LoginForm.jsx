@@ -6,7 +6,6 @@ export const LoginForm = ({ onNavigateToSignUp }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
-  // New UI states for a production-ready experience
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
@@ -21,7 +20,7 @@ export const LoginForm = ({ onNavigateToSignUp }) => {
 
     try {
       // In production, always use environment variables for API routes
-      // e.g., import.meta.env.VITE_API_URL or process.env.REACT_APP_API_URL
+      // e.g.,n import.meta.ev.VITE_API_URL or process.env.REACT_APP_API_URL
       const API_URL = 'http://localhost:5000/api/login';
 
       const response = await fetch(API_URL, {
@@ -42,7 +41,7 @@ export const LoginForm = ({ onNavigateToSignUp }) => {
         // Trigger optional callback to redirect or update parent state
         if (response.ok) {
 
-          navigate("/container");
+          window.location.href = "/container";
         }
 
 

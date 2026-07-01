@@ -9,16 +9,17 @@ import { Comment } from "./components/Comment"
 // (Make sure to adjust these paths based on where you saved the files!)
 import { UploadProvider } from "./context/UploadContext"
 import { GlobalUploadManager } from "./components/GlobalUploadManager"
+import { UserProvider } from "./context/UserContext"
 
 function App() {
       return (
             // 2. Wrap the entire app with the UploadProvider
-            <UploadProvider>
+            <UserProvider>            <UploadProvider>
                   {/* Added a relative wrapper to ensure the fixed widget positions correctly */}
                   <div className="relative min-h-screen">
 
                         <Routes>
-                              <Route path="/" element={<AuthContainer />} />
+                              <Route path="/login" element={<AuthContainer />} />
                               <Route path="/container" element={<Container />} />
                               <Route path="/sparkdashboard" element={<SparkDashboard />} />
                         </Routes>
@@ -28,6 +29,8 @@ function App() {
 
                   </div>
             </UploadProvider>
+
+            </UserProvider>
       )
 }
 
