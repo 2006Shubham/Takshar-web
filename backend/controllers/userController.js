@@ -6,7 +6,7 @@ const Spark = require('../models/Spark');
 // @access  Private
 const getUsers = async (req, res) => {
     try {
-        const peers = await User.find({ _id: { $ne: req.user._id } }).select('username role');
+        const peers = await User.find({ _id: { $ne: req.user._id } }).select('profileName role profileUrl');
         res.status(200).json({ userlist: peers });
     } catch (error) {
         res.status(500).json({ error: "Internal server error" });
@@ -135,7 +135,7 @@ const editUserProfile = async (req, res) => {
             profileUrl: profileUrl,
             bannerUrl: bannerUrl
         }
-            , { new: true}
+            , { new: true }
         );
 
 

@@ -1,5 +1,4 @@
 import React from 'react';
-import { formatJoinDate } from '../utils/dateUtils';
 
 export const MyConnections = ({ connections }) => {
   if (connections.length === 0) return <p className="text-center py-10 text-gray-500">You haven't made any connections yet.</p>;
@@ -9,8 +8,8 @@ export const MyConnections = ({ connections }) => {
       {connections.map(({ connectionId, peer }) => (
         <div key={connectionId} className="flex flex-col rounded-3xl bg-white p-6 shadow-sm ring-1 ring-gray-200">
           <div className="flex flex-col items-center text-center">
-            <img src={peer.profileUrl} alt={peer.username} className="h-20 w-20 rounded-full object-cover ring-4 ring-gray-50" />
-            <h3 className="mt-4 text-base font-bold text-gray-900">@{peer.username}</h3>
+            <img src={peer.profileUrl} alt={peer.profileName} className="h-20 w-20 rounded-full object-cover ring-4 ring-gray-50" />
+            <h3 className="mt-4 text-base font-bold text-gray-900">@{peer.profileName}</h3>
             <span className="mt-1 text-xs text-gray-500">{peer.role}</span>
           </div>
           <div className="mt-6">

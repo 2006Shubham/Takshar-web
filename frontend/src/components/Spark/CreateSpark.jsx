@@ -36,7 +36,7 @@ export const CreateSpark = () => {
     // Bulletproof filtering tracking database username and role paths
     const filteredUsers = (Array.isArray(availableUsers) ? availableUsers : []).filter(user => {
         const term = userSearchTerm ? userSearchTerm.toLowerCase() : '';
-        const matchName = user.username?.toLowerCase().includes(term) || false;
+        const matchName = user.profileName?.toLowerCase().includes(term) || false;
         const matchRole = user.role?.toLowerCase().includes(term) || false;
         return matchName || matchRole;
     });
@@ -153,7 +153,7 @@ export const CreateSpark = () => {
                                 />
                                 <div>
                                     <p className={`text-sm font-medium ${selectedUserId === user._id ? 'text-orange-900' : 'text-gray-900'}`}>
-                                        {user.username}
+                                        {user.profileName}
                                     </p>
                                     {/* Hydrated with Mongoose user.role option fallback */}
                                     <p className={`text-xs ${selectedUserId === user._id ? 'text-orange-700' : 'text-gray-500'}`}>

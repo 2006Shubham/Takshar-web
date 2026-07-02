@@ -2,12 +2,12 @@ import React, { useState, useEffect } from 'react';
 
 // --- MOCK DATA ---
 const MOCK_LEADERBOARD = [
-    { _id: '1', username: 'sneha_dev', profileUrl: 'https://i.pravatar.cc/150?u=sneha', completedSparks: 142 },
-    { _id: '2', username: 'shubham', profileUrl: 'https://i.pravatar.cc/150?u=shubham', completedSparks: 128 },
-    { _id: '3', username: 'vikram_system', profileUrl: 'https://i.pravatar.cc/150?u=vikram', completedSparks: 115 },
-    { _id: '4', username: 'priya_ux', profileUrl: 'https://i.pravatar.cc/150?u=priya', completedSparks: 94 },
-    { _id: '5', username: 'aryan_codes', profileUrl: 'https://i.pravatar.cc/150?u=aryan', completedSparks: 87 },
-    { _id: '6', username: 'karan_ui', profileUrl: 'https://i.pravatar.cc/150?u=karan', completedSparks: 62 },
+    { _id: '1', profileName: 'sneha_dev', profileUrl: 'https://i.pravatar.cc/150?u=sneha', completedSparks: 142 },
+    { _id: '2', profileName: 'shubham', profileUrl: 'https://i.pravatar.cc/150?u=shubham', completedSparks: 128 },
+    { _id: '3', profileName: 'vikram_system', profileUrl: 'https://i.pravatar.cc/150?u=vikram', completedSparks: 115 },
+    { _id: '4', profileName: 'priya_ux', profileUrl: 'https://i.pravatar.cc/150?u=priya', completedSparks: 94 },
+    { _id: '5', profileName: 'aryan_codes', profileUrl: 'https://i.pravatar.cc/150?u=aryan', completedSparks: 87 },
+    { _id: '6', profileName: 'karan_ui', profileUrl: 'https://i.pravatar.cc/150?u=karan', completedSparks: 62 },
 ];
 
 export const Leaderboard = () => {
@@ -69,9 +69,9 @@ export const Leaderboard = () => {
                     {/* Rank 2 (Silver) */}
                     <div className="flex flex-col items-center pb-4 animate-in slide-in-from-bottom-8 duration-700 delay-100">
                         <div className="relative mb-2">
-                            <img src={topThree[1].profileUrl} alt={topThree[1].username} className="h-16 w-16 sm:h-20 sm:w-20 rounded-full object-cover ring-4 ring-gray-200 shadow-lg" />
+                            <img src={topThree[1].profileUrl} alt={topThree[1].profileName} className="h-16 w-16 sm:h-20 sm:w-20 rounded-full object-cover ring-4 ring-gray-200 shadow-lg" />
                         </div>
-                        <h3 className="text-sm sm:text-base font-bold text-gray-900 mt-2">@{topThree[1].username}</h3>
+                        <h3 className="text-sm sm:text-base font-bold text-gray-900 mt-2">@{topThree[1].profileName}</h3>
                         <p className="text-xs sm:text-sm font-semibold text-orange-600">{topThree[1].completedSparks} Sparks</p>
                         {/* Silver Pillar with Embedded Trophy */}
                         <div className="mt-3 w-20 sm:w-24 h-24 bg-gradient-to-t from-gray-200 to-gray-50 rounded-t-xl border-t border-x border-gray-300 flex flex-col items-center justify-center shadow-inner">
@@ -83,9 +83,9 @@ export const Leaderboard = () => {
                     {/* Rank 1 (Gold) */}
                     <div className="flex flex-col items-center z-10 animate-in slide-in-from-bottom-12 duration-700">
                         <div className="relative mb-2">
-                            <img src={topThree[0].profileUrl} alt={topThree[0].username} className="h-20 w-20 sm:h-24 sm:w-24 rounded-full object-cover ring-4 ring-yellow-400 shadow-xl" />
+                            <img src={topThree[0].profileUrl} alt={topThree[0].profileName} className="h-20 w-20 sm:h-24 sm:w-24 rounded-full object-cover ring-4 ring-yellow-400 shadow-xl" />
                         </div>
-                        <h3 className="text-base sm:text-lg font-bold text-gray-900 mt-2">@{topThree[0].username}</h3>
+                        <h3 className="text-base sm:text-lg font-bold text-gray-900 mt-2">@{topThree[0].profileName}</h3>
                         <p className="text-sm font-bold text-orange-600">{topThree[0].completedSparks} Sparks</p>
                         {/* Gold Pillar with Embedded Trophy */}
                         <div className="mt-3 w-24 sm:w-28 h-32 bg-gradient-to-t from-yellow-100 to-yellow-50 rounded-t-xl border-t border-x border-yellow-300 flex flex-col items-center justify-center shadow-inner">
@@ -97,9 +97,9 @@ export const Leaderboard = () => {
                     {/* Rank 3 (Bronze) */}
                     <div className="flex flex-col items-center pb-4 animate-in slide-in-from-bottom-8 duration-700 delay-200">
                         <div className="relative mb-2">
-                            <img src={topThree[2].profileUrl} alt={topThree[2].username} className="h-16 w-16 sm:h-20 sm:w-20 rounded-full object-cover ring-4 ring-orange-200 shadow-lg" />
+                            <img src={topThree[2].profileUrl} alt={topThree[2].profileName} className="h-16 w-16 sm:h-20 sm:w-20 rounded-full object-cover ring-4 ring-orange-200 shadow-lg" />
                         </div>
-                        <h3 className="text-sm sm:text-base font-bold text-gray-900 mt-2">@{topThree[2].username}</h3>
+                        <h3 className="text-sm sm:text-base font-bold text-gray-900 mt-2">@{topThree[2].profileName}</h3>
                         <p className="text-xs sm:text-sm font-semibold text-orange-600">{topThree[2].completedSparks} Sparks</p>
                         {/* Bronze Pillar with Embedded Trophy */}
                         <div className="mt-3 w-20 sm:w-24 h-16 bg-gradient-to-t from-orange-100 to-orange-50 rounded-t-xl border-t border-x border-orange-200 flex flex-col items-center justify-center shadow-inner">
@@ -123,9 +123,9 @@ export const Leaderboard = () => {
                             </span>
 
                             <div className="flex items-center gap-3 sm:gap-4">
-                                <img src={user.profileUrl} alt={user.username} className="h-10 w-10 sm:h-12 sm:w-12 rounded-full object-cover ring-2 ring-gray-50" />
+                                <img src={user.profileUrl} alt={user.profileName} className="h-10 w-10 sm:h-12 sm:w-12 rounded-full object-cover ring-2 ring-gray-50" />
                                 <div>
-                                    <h4 className="text-sm sm:text-base font-bold text-gray-900 tracking-tight">@{user.username}</h4>
+                                    <h4 className="text-sm sm:text-base font-bold text-gray-900 tracking-tight">@{user.profileName}</h4>
                                 </div>
                             </div>
                         </div>

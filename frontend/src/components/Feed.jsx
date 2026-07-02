@@ -155,7 +155,7 @@ export const Feed = () => {
                                         <img
                                             className="inline-block h-10 w-10 rounded-full ring-2 ring-white object-cover"
                                             src={item.spark.sender.profileUrl}
-                                            alt={item.spark.sender.username}
+                                            alt={item.spark.sender.profileName}
                                         />
                                         <img
                                             className="inline-block h-10 w-10 rounded-full ring-2 ring-white object-cover"
@@ -165,9 +165,9 @@ export const Feed = () => {
                                     </div>
                                     <div className="text-sm">
                                         <p className="font-medium text-gray-900">
-                                            {item.spark.sender.username}{' '}
+                                            {item.spark.sender.profileName}{' '}
                                             <span className="text-orange-500 font-semibold mx-1">sparked</span>{' '}
-                                            {item.spark.to.username}
+                                            {item.spark.to.profileName}
                                         </p>
                                         <p className="text-gray-500 text-xs mt-0.5">{formatRelativeTime(item.createdAt)}</p>
                                     </div>

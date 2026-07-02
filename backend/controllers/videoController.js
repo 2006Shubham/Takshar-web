@@ -21,11 +21,11 @@ const getFeedVideos = async (req, res) => {
             populate: [
                 {
                     path: 'sender',
-                    select: 'username profileUrl'
+                    select: 'profileName profileUrl'
                 },
                 {
                     path: 'to',
-                    select: 'username profileUrl'
+                    select: 'profileName profileUrl'
                 }
             ]
         }).lean();

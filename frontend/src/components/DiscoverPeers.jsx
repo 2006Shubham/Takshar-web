@@ -9,8 +9,8 @@ export const DiscoverPeers = ({ peers, onConnect }) => {
             {peers.map((peer) => (
                 <div key={peer._id} className="flex flex-col rounded-3xl bg-white p-6 shadow-sm ring-1 ring-gray-200">
                     <div className="flex flex-col items-center text-center">
-                        <img src={peer.profileUrl} alt={peer.username} className="h-20 w-20 rounded-full object-cover ring-4 ring-gray-50" />
-                        <h3 className="mt-4 text-base font-bold text-gray-900">@{peer.username}</h3>
+                        <img src={peer.profileUrl} alt={peer.profileName} className="h-20 w-20 rounded-full object-cover ring-4 ring-gray-50" />
+                        <h3 className="mt-4 text-base font-bold text-gray-900">@{peer.profileName}</h3>
                         <span className="mt-1 inline-flex items-center rounded-full bg-orange-50 px-2.5 py-0.5 text-xs font-semibold text-orange-700">{peer.role}</span>
                         <p className="mt-3 text-xs text-gray-500">Joined {formatJoinDate(peer.createdAt)}</p>
                     </div>

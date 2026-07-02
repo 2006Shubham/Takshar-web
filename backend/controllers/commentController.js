@@ -16,7 +16,7 @@ const postComment = async (req, res) => {
         });
 
         const savedComment = await newComment.save();
-        newComment = await Comment.findById(newComment._id).populate('commenter', 'username profileUrl');
+        newComment = await Comment.findById(newComment._id).populate('commenter', 'profileName profileUrl');
 
         res.status(201).json(newComment);
     } catch (error) {
@@ -33,7 +33,7 @@ const fetchComments = async (req, res) => {
         const { videoId } = req.query;
         const userId = req.user._id;
         const comments = await Comment.find({ videoId: videoId, parentId: null })
-            .populate('commenter', 'username profileUrl')
+            .populate('commenter', 'profileName profileUrl')
             .sort({ createdAt: -1 })
             .lean();
 
@@ -66,7 +66,7 @@ const postReply = async (req, res) => {
         });
 
         const populatedReply = await Comment.findById(newReply._id)
-            .populate('commenter', 'username profileUrl');
+            .populate('commenter', 'profileName profileUrl');
 
         res.status(201).json(populatedReply);
     } catch (err) {
@@ -82,7 +82,7 @@ const fetchReplies = async (req, res) => {
     try {
         const { parentId } = req.query;
         const replies = await Comment.find({ parentId })
-            .populate('commenter', 'username profileUrl')
+            .populate('commenter', 'profileName profileUrl')
             .sort({ createdAt: 1 });
         res.json(replies);
     } catch (error) {

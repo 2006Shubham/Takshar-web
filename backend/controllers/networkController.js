@@ -11,7 +11,7 @@ const getNetwork = async (req, res) => {
         // 1. Fetch ALL connections involving this user
         const allConnections = await Connection.find({
             $or: [{ from: userId }, { to: userId }]
-        }).populate('from to', 'username role profileUrl createdAt');
+        }).populate('from to', 'profileName role profileUrl createdAt');
 
         const connections = [];
         const pendingReceived = [];
@@ -37,7 +37,7 @@ const getNetwork = async (req, res) => {
         // 3. Fetch Discover Pool (Everyone NOT in the excluded list)
         const discoverPeers = await User.find({
             _id: { $nin: excludedUserIds }
-        }).select('username role profileUrl createdAt');
+        }).select('profileName role profileUrl createdAt');
 
         res.status(200).json({
             discover: discoverPeers,
@@ -70,7 +70,7 @@ const sendConnectionRequest = async (req, res) => {
         const newConnection = await Connection.create({ from, to });
 
         // Populate the 'to' user so the frontend can immediately add them to the 'Sent' tab
-        await newConnection.populate('to', 'username role profileUrl createdAt');
+        await newConnection.populate('to', 'profileName role profileUrl createdAt');
 
         res.status(201).json(newConnection);
     } catch (error) {

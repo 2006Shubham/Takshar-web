@@ -47,7 +47,7 @@ export const SentSparks = () => {
             <img src={spark.to.profileUrl} alt="" className="h-10 w-10 rounded-full mt-1 object-cover ring-2 ring-white shadow-sm" />
             <div>
               <p className="text-sm font-medium text-gray-900">
-                You <span className="font-semibold text-orange-500">sparked {spark.to.username}</span>
+                You <span className="font-semibold text-orange-500">sparked {spark.to.profileName}</span>
               </p>
               <p className="text-base font-bold text-gray-900 mt-1 leading-tight">{spark.topic}</p>
               <p className="text-xs text-gray-500 mt-2 flex items-center gap-1">

@@ -110,7 +110,7 @@ export const Comment = ({ videoId, onClose }) => {
                             <div key={comment._id} className="flex gap-4">
                                 <img
                                     src={comment.commenter?.profileUrl || 'https://i.pravatar.cc/150'}
-                                    alt={comment.commenter?.username || 'User'}
+                                    alt={comment.commenter?.profileName || 'User'}
                                     className="h-10 w-10 rounded-full object-cover mt-1 flex-shrink-0 shadow-sm"
                                 />
                                 <div className="flex-1 min-w-0">
@@ -118,7 +118,7 @@ export const Comment = ({ videoId, onClose }) => {
                                     {/* Top Level Comment Bubble */}
                                     <div className="rounded-2xl rounded-tl-none bg-gray-50 px-4 py-3 hover:bg-gray-100 transition-colors">
                                         <div className="flex items-center justify-between mb-1">
-                                            <h4 className="text-sm font-bold text-gray-900 truncate pr-2">{comment.commenter?.username}</h4>
+                                            <h4 className="text-sm font-bold text-gray-900 truncate pr-2">{comment.commenter?.profileName}</h4>
                                             <span className="text-xs font-medium text-gray-500 whitespace-nowrap">{comment.cretedAt}</span>
                                         </div>
                                         <p className="text-sm text-gray-700 leading-relaxed break-words">

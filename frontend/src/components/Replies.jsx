@@ -164,11 +164,11 @@ export const Replies = ({ parentEntity, userId, onLikeToggle }) => {
                     {replies.map((reply) => (
                         <div key={reply._id} className="group">
                             <div className="flex gap-3 items-start">
-                                <img src={reply.commenter?.profileUrl || 'https://i.pravatar.cc/150'} className="h-8 w-8 rounded-full shadow-sm object-cover mt-1" alt={reply.commenter?.username} />
+                                <img src={reply.commenter?.profileUrl || 'https://i.pravatar.cc/150'} className="h-8 w-8 rounded-full shadow-sm object-cover mt-1" alt={reply.commenter?.profileName} />
                                 <div className="flex-1 min-w-0">
                                     <div className="bg-gray-50 hover:bg-gray-100 px-4 py-3 rounded-2xl rounded-tl-none transition-colors">
                                         <div className="flex items-center justify-between mb-1">
-                                            <span className="text-sm font-bold text-gray-900 truncate pr-2">{reply.commenter?.username}</span>
+                                            <span className="text-sm font-bold text-gray-900 truncate pr-2">{reply.commenter?.profileName}</span>
                                             <span className="text-xs font-medium text-gray-500 whitespace-nowrap">{reply.createdAt ? formatRelativeTime(reply.createdAt) : 'Just now'}</span>
                                         </div>
                                         <p className="text-sm text-gray-700 leading-relaxed break-words">{reply.text}</p>

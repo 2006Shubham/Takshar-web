@@ -130,7 +130,7 @@ export const ReceivedSparks = () => {
             <img src={spark.sender.profileUrl} alt="" className="h-10 w-10 rounded-full mt-1 object-cover" />
             <div>
               <p className="text-sm font-medium text-gray-900">
-                {spark.sender.username} <span className="text-orange-500 font-bold">sparks you</span>
+                {spark.sender.profileName} <span className="text-orange-500 font-bold">sparks you</span>
               </p>
               <p className="text-base font-bold text-gray-900 mt-1 leading-tight">{spark.topic}</p>
               <p className="text-xs text-gray-500 mt-2 flex items-center gap-1">

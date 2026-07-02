@@ -36,7 +36,7 @@ const getSentSparks = async (req, res) => {
         const userid = req.user._id;
         const usersSentSparks = await Spark.find({ sender: userid }).populate(
             'to',
-            'username profileUrl'
+            'profileName profileUrl'
         );
 
         res.status(200).json({ usersSentSparks });
@@ -54,7 +54,7 @@ const getReceivedSparks = async (req, res) => {
         const userid = req.user._id;
         const receivedsparkdoc = await Spark.find({ to: userid }).populate(
             'sender',
-            'profileUrl username'
+            'profileUrl profileName'
         );
 
         res.status(200).json(receivedsparkdoc);
