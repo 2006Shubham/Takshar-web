@@ -6,7 +6,7 @@ const jsonwebtoken = require('jsonwebtoken');
 // @access  Public
 const signup = async (req, res) => {
     try {
-        const { username, password } = req.body;
+        const { username, password,role,organization } = req.body;
 
         if (!username || !password) {
             return res.status(400).json({ error: "username and the password is not defined" });
@@ -20,7 +20,9 @@ const signup = async (req, res) => {
 
         const newUser = new User({
             username,
-            password
+            password,
+            role,
+            organization
         });
 
         await newUser.save();

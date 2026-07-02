@@ -89,8 +89,11 @@ export const ProfileDropdown = () => {
                 <h3 className="text-base font-bold text-gray-900 truncate">
                   {userProfileData.name}
                 </h3>
+                <h3 className="text-base font-bold text-gray-900 truncate">
+                  {userProfileData.organization}
+                </h3>
                 <p className="text-xs text-gray-600 mt-1 line-clamp-3 leading-snug">
-                  {userProfileData.headline}
+                  {userProfileData.role}
                 </p>
               </div>
             </div>

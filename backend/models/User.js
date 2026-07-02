@@ -32,7 +32,8 @@ const userSchema = new mongoose.Schema({
     createdAt: {
         type: Date,
         default: Date.now
-    }
+    },
+    organization: { type: String }
 });
 
 const User = mongoose.model('User', userSchema);

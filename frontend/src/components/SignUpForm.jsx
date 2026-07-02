@@ -3,6 +3,8 @@ import { useState } from 'react';
 export const SignUpForm = ({ onSuccess, onNavigateToLogin }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [role, setRole] = useState('');
+  const [organization, setOrganization] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('');
 
   // Production UX states
@@ -38,7 +40,7 @@ export const SignUpForm = ({ onSuccess, onNavigateToLogin }) => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ username, password }),
+        body: JSON.stringify({ username, password, role, organization }),
       });
 
       const data = await response.json();
@@ -70,7 +72,7 @@ export const SignUpForm = ({ onSuccess, onNavigateToLogin }) => {
       <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-[480px]">
         <div className="bg-white px-6 py-12 shadow-sm ring-1 ring-gray-200 sm:rounded-2xl sm:px-12">
           <form className="space-y-6" onSubmit={handleSubmit}>
-            
+
             {/* Error Message Alert Banner */}
             {errorMessage && (
               <div className="rounded-md bg-red-50 p-4 border border-red-200 transition-all">
@@ -107,6 +109,48 @@ export const SignUpForm = ({ onSuccess, onNavigateToLogin }) => {
               </div>
             </div>
 
+            {/* Role Input */}
+            <div>
+              <label htmlFor="signup-role" className="block text-sm font-medium leading-6 text-gray-900">
+                Role
+              </label>
+              <div className="mt-2">
+                <input
+                  id="signup-role"
+                  name="role"
+                  type="text"
+                  autoComplete="role"
+                  required
+                  value={role}
+                  onChange={(e) => setRole(e.target.value)}
+                  disabled={isLoading}
+                  className="block w-full rounded-xl border-0 py-2.5 px-3.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-orange-600 sm:text-sm sm:leading-6 outline-none transition-shadow disabled:bg-gray-50 disabled:text-gray-500"
+                />
+              </div>
+            </div>
+
+            {/* Organization Input */}
+            <div>
+              <label htmlFor="signup-organization" className="block text-sm font-medium leading-6 text-gray-900">
+                Organization
+              </label>
+              <div className="mt-2">
+                <input
+                  id="signup-organization"
+                  name="organization"
+                  type="text"
+                  autoComplete="organization"
+                  required
+                  value={organization}
+                  onChange={(e) => setOrganization(e.target.value)}
+                  disabled={isLoading}
+                  className="block w-full rounded-xl border-0 py-2.5 px-3.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-orange-600 sm:text-sm sm:leading-6 outline-none transition-shadow disabled:bg-gray-50 disabled:text-gray-500"
+                />
+              </div>
+            </div>
+
+
+
             {/* Password Input */}
             <div>
               <label htmlFor="signup-password" className="block text-sm font-medium leading-6 text-gray-900">
@@ -142,15 +186,14 @@ export const SignUpForm = ({ onSuccess, onNavigateToLogin }) => {
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   disabled={isLoading}
-                  className={`block w-full rounded-xl border-0 py-2.5 px-3.5 text-gray-900 shadow-sm ring-1 ring-inset focus:ring-2 focus:ring-inset sm:text-sm sm:leading-6 outline-none transition-all disabled:bg-gray-50 disabled:text-gray-500 ${
-                    passwordsMismatch 
-                      ? 'ring-red-300 focus:ring-red-500' 
-                      : passwordsMatch
-                        ? 'ring-green-300 focus:ring-green-500'
-                        : 'ring-gray-300 focus:ring-orange-600'
-                  }`}
+                  className={`block w-full rounded-xl border-0 py-2.5 px-3.5 text-gray-900 shadow-sm ring-1 ring-inset focus:ring-2 focus:ring-inset sm:text-sm sm:leading-6 outline-none transition-all disabled:bg-gray-50 disabled:text-gray-500 ${passwordsMismatch
+                    ? 'ring-red-300 focus:ring-red-500'
+                    : passwordsMatch
+                      ? 'ring-green-300 focus:ring-green-500'
+                      : 'ring-gray-300 focus:ring-orange-600'
+                    }`}
                 />
-                
+
                 {/* Real-time Match Indicator */}
                 {passwordsMatch && (
                   <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
@@ -190,7 +233,7 @@ export const SignUpForm = ({ onSuccess, onNavigateToLogin }) => {
           {/* Navigation to Login */}
           <p className="mt-10 text-center text-sm text-gray-500">
             Already have an account?{' '}
-            <button 
+            <button
               onClick={onNavigateToLogin}
               className="font-semibold leading-6 text-orange-600 hover:text-orange-500 transition-colors bg-transparent border-none p-0 cursor-pointer"
             >

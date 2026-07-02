@@ -31,8 +31,10 @@ export const ProfileSidebar = () => {
                 <h2 className="text-lg font-bold text-gray-900 leading-tight">
                     {userProfileData.name}
                 </h2>
-                <p className="mt-1 md:text-center text-xs font-medium text-gray-500">
-                    {userProfileData.headline}
+
+                <h3 className="=text-lg font bold text-gray-900 leading-tight"> {userProfileData.organization} </h3>
+                <p className="mt-1 md:text-left text-xs font-medium text-gray-500">
+                    {userProfileData.role}
                 </p>
             </div>
 

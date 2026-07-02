@@ -69,9 +69,11 @@ const getUserProfile = async (req, res) => {
         if (!user) {
             return res.status(404).json({ error: "User not found" });
         }
-        
+
+
         const username = user.username;
         const role = user.role;
+        const organization = user.organization;
         const profileUrl = user.profileUrl;
         const peersCount = user.peers.length || 0;
         const [sentCount, receivedCount] = await Promise.all([
@@ -100,7 +102,7 @@ const getUserProfile = async (req, res) => {
 
         console.log("!!!!!!!!!!!!Seent Count !!!!!!!!!!", sentCount);
         console.log("!!!!!!!!!!!!Seent Count !!!!!!!!!!", receivedCount);
-        
+
         res.json({
             sentCount,
             receivedCount,
@@ -108,7 +110,8 @@ const getUserProfile = async (req, res) => {
             peersCount,
             role,
             profileUrl,
-            displayStreak
+            displayStreak,
+            organization
         });
     } catch (error) {
         console.error("Profile fetch error:", error);
