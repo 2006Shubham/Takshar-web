@@ -14,7 +14,11 @@ export const ReceivedSparks = () => {
 
   const [completingSpark, setCompletingSpark] = useState({});
 
+  const [isUploading, setIsUploading] = useState(false);
+
   const { uploads } = useUpload();
+
+
 
 
   useEffect(() => {
@@ -162,6 +166,7 @@ export const ReceivedSparks = () => {
 
             {spark.status === 'accepted' && (
               <button
+                disabled={isUploading}
                 onClick={() => {
                   uploadVidio(spark);
                   ;
@@ -170,7 +175,7 @@ export const ReceivedSparks = () => {
                 className="inline-flex items-center gap-2 text-sm font-medium text-white bg-orange-600 hover:bg-orange-500 px-4 py-2 rounded-lg shadow-sm transition-all"
               >
                 <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
-                Upload Video
+                {isUploading ? "uploading" : "Upload Video"}
               </button>
             )}
 
@@ -195,7 +200,7 @@ export const ReceivedSparks = () => {
 
       {showUpload && (
 
-        <UploadVideo spark={completingSpark} onClose={() => setShowUpload(false)} />
+        <UploadVideo onUploadStart={() => setIsUploading(true)} spark={completingSpark} onClose={() => setShowUpload(false)} />
 
       )}
 

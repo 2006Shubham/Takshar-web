@@ -11,9 +11,9 @@ const MOCK_LEADERBOARD = [
 ];
 
 export const Leaderboard = () => {
+    // Start with mock data so the UI always has something to render initially
     const [leaders, setLeaders] = useState(MOCK_LEADERBOARD);
     const [isLoading, setIsLoading] = useState(false);
-
 
     useEffect(() => {
         const fetchLeaderboard = async () => {
@@ -21,9 +21,21 @@ export const Leaderboard = () => {
             try {
                 const res = await fetch('http://localhost:5000/api/leaderboard', { credentials: 'include' });
                 const data = await res.json();
-                setLeaders(data);
+
+                // --- THE FIX: Safe Data Checking ---
+                if (Array.isArray(data)) {
+                    if (data.length === 0) {
+                        console.warn("Backend returned an empty array []. Database might be empty or $lookup failed.");
+                        // Optional: Keep mock data visible if database is empty for testing
+                    } else {
+                        setLeaders(data); // Safely update if it's a real array with data
+                    }
+                } else {
+                    console.error("Backend sent an error or object instead of an array:", data);
+                    // State remains as MOCK_LEADERBOARD, preventing the `.slice` crash!
+                }
             } catch (error) {
-                console.error("Failed to load leaderboard", error);
+                console.error("Failed to load leaderboard. CORS issue or Backend is down:", error);
             } finally {
                 setIsLoading(false);
             }
@@ -43,6 +55,7 @@ export const Leaderboard = () => {
         );
     }
 
+    // Because of our safety check, `leaders` is guaranteed to be an array here.
     const topThree = leaders.slice(0, 3);
     const theRest = leaders.slice(3);
 

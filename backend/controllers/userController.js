@@ -46,7 +46,7 @@ const getLeaderboard = async (req, res) => {
                 $project: {
                     _id: 1,
                     completedSparks: 1,
-                    username: "$userData.username",
+                    profileName: "$userData.profileName",
                     profileUrl: "$userData.profileUrl"
                 }
             }

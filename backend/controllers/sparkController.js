@@ -92,7 +92,10 @@ const getSparkDashboard = async (req, res) => {
 const changeSparkStatus = async (req, res) => {
     try {
         const { newStatus, id } = req.body;
-        const updatedSpark = await Spark.findByIdAndUpdate(id, { status: newStatus }, { new: true });
+        const updatedSpark = await Spark.findByIdAndUpdate(id, { status: newStatus }, { new: true }).populate(
+            'sender',
+            'profileUrl profileName'
+        );
         res.status(201).json({ updatedSpark });
     } catch (error) {
         console.error("Error changing spark status:", error);
@@ -120,7 +123,7 @@ const completeSpark = async (req, res) => {
         const saveVideo = await newVidio.save();
 
         const updatedSpark = await Spark.findByIdAndUpdate(
-            video.spark._id, 
+            video.spark._id,
             {
                 videoId: saveVideo._id,
                 status: 'success'

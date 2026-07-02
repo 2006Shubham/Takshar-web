@@ -1,7 +1,7 @@
 import { useState, useRef } from "react";
 import { useUpload } from "../context/UploadContext"; 
 
-export const UploadVideo = ({ onClose, spark }) => {
+export const UploadVideo = ({onUploadStart, onClose, spark }) => {
   // UI Interaction States
   const [isDragging, setIsDragging] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -64,6 +64,7 @@ export const UploadVideo = ({ onClose, spark }) => {
 
     // 1. Pass the file and spark data to the background context
     startUpload(selectedFile, spark);
+    onUploadStart();
 
     // 2. Immediately close this modal so the user can interact with the app
     onClose();
