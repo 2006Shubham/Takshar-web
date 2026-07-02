@@ -32,7 +32,7 @@ export const UploadProvider = ({ children }) => {
 
     try {
       // 2. Get Signature
-      const signRes = await fetch("http://localhost:5000/api/uploadsignature", { credentials: "include" });
+      const signRes = await fetch("http://localhost:5000/api/uploadsignature?uploadType=video", { credentials: "include" });
       if (!signRes.ok) throw new Error("Failed to authenticate upload.");
       const auth = await signRes.json();
 

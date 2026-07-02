@@ -76,6 +76,7 @@ const getUserProfile = async (req, res) => {
         const organization = user.organization;
         const profileUrl = user.profileUrl;
         const peersCount = user.peers.length || 0;
+        const bannerUrl = user.bannerUrl;
         const [sentCount, receivedCount] = await Promise.all([
             Spark.countDocuments({ sender: userId }),
             Spark.countDocuments({ to: userId })
@@ -111,7 +112,8 @@ const getUserProfile = async (req, res) => {
             role,
             profileUrl,
             displayStreak,
-            organization
+            organization,
+            bannerUrl
         });
     } catch (error) {
         console.error("Profile fetch error:", error);
@@ -119,8 +121,43 @@ const getUserProfile = async (req, res) => {
     }
 };
 
+
+const editUserProfile = async (req, res) => {
+
+    try {
+
+        const { username, role, organization, profileUrl, bannerUrl } = req.body;
+
+        const updateUser = await User.findByIdAndUpdate(req.user._id, {
+            username: username,
+            role: role,
+            organization: organization,
+            profileUrl: profileUrl,
+            bannerUrl: bannerUrl
+        }
+            , { new: true, runValidators: true }
+        );
+
+
+        if (!updateUser) {
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        res.status(200).json({ message: "Profile updated successfully", user: updateUser });
+
+    } catch (error) {
+        if (error.code === 11000) {
+            return res.status(400).json({ error: "Username is already taken" });
+        }
+        console.error("Profile update error:", error);
+        res.status(500).json({ error: "Failed to update profile" });
+    }
+
+}
+
 module.exports = {
     getUsers,
     getLeaderboard,
-    getUserProfile
+    getUserProfile,
+    editUserProfile
 };

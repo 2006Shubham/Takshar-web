@@ -20,11 +20,11 @@ export const UserProvider = ({ children }) => {
         if (response.ok) {
           const data = await response.json();
           setUserProfileData({
-            name: data.username,
+            name: data.profileName,
             role: data.role,
             organization:data.organization,
             avatarUrl: data.profileUrl,
-            bannerUrl: "https://images.unsplash.com/photo-1557683316-973673baf926?auto=format&fit=crop&w=400&q=80",
+            bannerUrl: data.bannerUrl,
             stats: {
               sparksSent: data.sentCount,
               sparksReceived: data.receivedCount,

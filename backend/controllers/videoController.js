@@ -89,8 +89,15 @@ const toggleLikeVideo = async (req, res) => {
 // @access  Private
 const getUploadSignature = (req, res) => {
     try {
+        const { uploadType } = req.query;
         const timestamp = Math.floor(Date.now() / 1000);
-        const folder = 'takshar/videos';
+        const folderPaths = {
+            video: 'takshar/videos',
+            profile: 'takshar/profiles',
+            banner: 'takshar/banners'
+        };
+
+        const folder = folderPaths[uploadType] || 'takshar/uncategorized';
 
         const signature = cloudinary.utils.api_sign_request(
             { timestamp, folder },

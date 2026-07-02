@@ -21,6 +21,7 @@ router.post('/logout', authController.logout);
 router.get('/users', protect, userController.getUsers);
 router.get('/userprofile', protect, userController.getUserProfile);
 router.get('/leaderboard', userController.getLeaderboard);
+router.put('/userprofile/edit', protect, userController.editUserProfile)
 
 // 3. Spark routes
 router.post('/sendspark', protect, sparkController.sendSpark);
