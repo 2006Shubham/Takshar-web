@@ -87,11 +87,11 @@ export const ProfileDropdown = () => {
               />
               <div className="flex-1 min-w-0">
                 <h3 className="text-base font-bold text-gray-900 truncate">
-                  {userProfileData.name}
+                  {userProfileData.profileName}
                 </h3>
-                <h3 className="text-base font-bold text-gray-900 truncate">
+                <h2 className="text-lg font bold text-gray-900 leading-tight truncate">
                   {userProfileData.organization}
-                </h3>
+                </h2>
                 <p className="text-xs text-gray-600 mt-1 line-clamp-3 leading-snug">
                   {userProfileData.role}
                 </p>

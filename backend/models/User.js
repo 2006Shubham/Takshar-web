@@ -10,7 +10,6 @@ const userSchema = new mongoose.Schema({
     profileName:{
             type : String,
             trim: true,
-            default:username
     },
     role: {
         type: String,

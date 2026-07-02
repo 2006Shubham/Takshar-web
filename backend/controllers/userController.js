@@ -71,7 +71,7 @@ const getUserProfile = async (req, res) => {
         }
 
 
-        const username = user.username;
+        const profileName = user.profileName;
         const role = user.role;
         const organization = user.organization;
         const profileUrl = user.profileUrl;
@@ -107,7 +107,7 @@ const getUserProfile = async (req, res) => {
         res.json({
             sentCount,
             receivedCount,
-            username,
+            profileName,
             peersCount,
             role,
             profileUrl,
@@ -126,16 +126,16 @@ const editUserProfile = async (req, res) => {
 
     try {
 
-        const { username, role, organization, profileUrl, bannerUrl } = req.body;
+        const { profileName, role, organization, profileUrl, bannerUrl } = req.body;
 
         const updateUser = await User.findByIdAndUpdate(req.user._id, {
-            username: username,
+            profileName: profileName,
             role: role,
             organization: organization,
             profileUrl: profileUrl,
             bannerUrl: bannerUrl
         }
-            , { new: true, runValidators: true }
+            , { new: true}
         );
 
 

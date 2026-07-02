@@ -7,7 +7,7 @@ export const EditProfile = ({ isOpen, onClose }) => {
 
     // Form State
     const [formData, setFormData] = useState({
-        username: userProfileData?.name || '',
+        profileName: userProfileData?.profileName || '',
         role: userProfileData?.role || '',
         organization: userProfileData?.organization || '',
     });
@@ -112,7 +112,7 @@ export const EditProfile = ({ isOpen, onClose }) => {
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'include',
                 body: JSON.stringify({
-                    username: formData.username,
+                    profileName: formData.profileName,
                     role: formData.role,
                     organization: formData.organization,
                     profileUrl: finalAvatarUrl,
@@ -128,7 +128,7 @@ export const EditProfile = ({ isOpen, onClose }) => {
             // 3. Update the global context instantly
             setUserProfileData(prev => ({
                 ...prev,
-                name: formData.username,
+                profileName: formData.profileName,
                 role: formData.role,
                 organization: formData.organization,
                 avatarUrl: finalAvatarUrl,
@@ -193,8 +193,8 @@ export const EditProfile = ({ isOpen, onClose }) => {
                         {/* Text Inputs */}
                         <div className="space-y-4">
                             <div>
-                                <label className="block text-sm font-bold text-gray-700 mb-1">Username</label>
-                                <input required type="text" name="username" value={formData.username} onChange={handleTextChange} className="w-full rounded-xl border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500 sm:text-sm px-4 py-2.5 border" />
+                                <label className="block text-sm font-bold text-gray-700 mb-1">Profile Name</label>
+                                <input required type="text" name="profileName" value={formData.profileName} onChange={handleTextChange} className="w-full rounded-xl border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500 sm:text-sm px-4 py-2.5 border" />
                             </div>
                             <div>
                                 <label className="block text-sm font-bold text-gray-700 mb-1">Professional Role</label>

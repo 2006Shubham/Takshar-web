@@ -20,7 +20,7 @@ export const UserProvider = ({ children }) => {
         if (response.ok) {
           const data = await response.json();
           setUserProfileData({
-            name: data.profileName,
+            profileName: data.profileName,
             role: data.role,
             organization:data.organization,
             avatarUrl: data.profileUrl,
