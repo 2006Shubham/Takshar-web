@@ -13,8 +13,18 @@ const generateSparkTrack = async (req, res) => {
     try {
 
 
-        const tracks = SparkTrack.find({userId:req.user._id});
+        const activeTracks = await SparkTrack.find({
+            userId: req.user.id,
+            isCompleted: false
+        });
 
+        // 2. Limit to 2 active tracks
+        if (activeTracks.length >= 2) {
+            // 3. MUST 'return' and provide a status code (400 Bad Request)
+            return res.status(400).json({
+                error: "You can only have 2 active tracks at a time. Please complete or abandon one first."
+            });
+        }
         const { topic, difficulty, totalDays } = req.body;
         const userId = req.user.id;
 
