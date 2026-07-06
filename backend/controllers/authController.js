@@ -3,7 +3,7 @@ const jsonwebtoken = require('jsonwebtoken');
 
 // @desc    Register a new user
 // @route   POST /api/signup
-// @access  Public
+// @access  Public-
 const signup = async (req, res) => {
     try {
         const { username, password,role,organization } = req.body;

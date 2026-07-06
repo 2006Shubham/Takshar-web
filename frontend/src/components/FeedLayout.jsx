@@ -1,6 +1,7 @@
 
 import { ProfileSidebar } from './ProfileSidebar';
 import { Feed } from './Feed'; // Assuming your Feed component is in this file
+import { SparkCompass } from './SparkTrack/SparkCompass';
 
 export const FeedLayout = () => {
     return (
@@ -38,6 +39,7 @@ export const FeedLayout = () => {
                         <h3 className="font-bold text-gray-900 mb-2">Trending Challenges</h3>
                         <p className="text-sm text-gray-500">More widgets coming soon...</p>
                     </div>
+
                 </aside>
 
             </div>

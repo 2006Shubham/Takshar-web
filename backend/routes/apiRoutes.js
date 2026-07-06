@@ -8,6 +8,7 @@ const sparkController = require('../controllers/sparkController');
 const videoController = require('../controllers/videoController');
 const commentController = require('../controllers/commentController');
 const networkController = require('../controllers/networkController');
+const sparkTrackController = require('../controllers/sparkTrackController')
 
 // Middleware
 const { protect } = require('../middleware/authMiddleware');
@@ -48,5 +49,11 @@ router.put('/dolikecomment', protect, commentController.toggleLikeComment);
 router.get('/network', protect, networkController.getNetwork);
 router.post('/connect', protect, networkController.sendConnectionRequest);
 router.put('/network/respond', protect, networkController.respondConnectionRequest);
+
+// 7. Spark Track routes
+
+router.post('/tracks/generate', protect, sparkTrackController.generateSparkTrack);
+router.get('/tracks', protect, sparkTrackController.getUserTracks); // Fetches all tracks for the dashboard
+router.put('/:trackId/submit', protect, sparkTrackController.submitTrackSpark); // Submits a video for a specific day
 
 module.exports = router;

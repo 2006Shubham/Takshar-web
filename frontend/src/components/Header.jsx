@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { ProfileDropdown } from './ProfileDropDown';
+import { href } from 'react-router-dom';
 
 /**
  * --- Dummy Data ---
@@ -12,6 +13,7 @@ const NAV_ITEMS = [
   { id: 'nav-spark', label: 'Spark', href: '#', isActive: true },
   { id: 'nav-peers', label: 'peers', href: '#', isActive: true },
   { id: 'nav-leaderboards', label: 'Leaderboards', href: '#', isActive: true },
+  { id: 'nav-sparktrack', label: 'Spark Track', href: '#', isActive: true }
 ];
 
 const MOCK_USER = {
@@ -87,8 +89,8 @@ export const Header = ({ onTabChange }) => {
               )}
             </button>
 
-          
-            <ProfileDropdown/>
+
+            <ProfileDropdown />
           </div>
         </div>
 

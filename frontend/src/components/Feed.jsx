@@ -58,18 +58,7 @@ export const Feed = () => {
         setCommentOnVideo(id);
 
 
-        //api to fetch comments
-
-        // const response = await fetch("http://localhost:5000/api/docomment",{
-
-        //         methods:'GET',
-        //         headers:{
-        //                     'Content-Type':'application/json'
-        //         },
-        //         credentials:'include'
-        // })
-
-        // const data = await response.json();
+       
 
     }
 

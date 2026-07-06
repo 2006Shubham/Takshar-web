@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
 import { Replies } from './Replies';
+import { useUser } from '../context/UserContext';
 
 export const Comment = ({ videoId, onClose }) => {
     const [comments, setComments] = useState([]);
     const [newComment, setNewComment] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [userId, setUserId] = useState('');
+    const { userProfileData } = useUser();
 
     useEffect(() => {
         const fetchComments = async () => {
@@ -70,7 +72,7 @@ export const Comment = ({ videoId, onClose }) => {
                 <div className="border-b border-gray-100 bg-gray-50/50 px-6 py-4 shrink-0">
                     <form onSubmit={handlePostComment} className="flex gap-4">
                         <img
-                            src="https://i.pravatar.cc/150?u=takshar_demo"
+                            src={userProfileData.avatarUrl}
                             alt="Your avatar"
                             className="h-10 w-10 rounded-full object-cover ring-2 ring-white shadow-sm flex-shrink-0"
                         />

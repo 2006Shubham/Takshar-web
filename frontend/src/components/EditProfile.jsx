@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import  { useState, useRef } from 'react';
 import { useUser } from '../context/UserContext';
 
 export const EditProfile = ({ isOpen, onClose }) => {
