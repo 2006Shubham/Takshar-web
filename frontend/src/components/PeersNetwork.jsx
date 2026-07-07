@@ -3,14 +3,17 @@ import { DiscoverPeers } from './DiscoverPeers';
 import { MyConnections } from './MyConnections';
 import { PendingRequests } from './PendingRequests';
 
+const tabs = [
+  { id: 'discover', label: 'Discover' },
+  { id: 'connections', label: 'My Peers' },
+  { id: 'pending', label: 'Requests' },
+];
+
 export const PeersNetwork = () => {
   const [activeTab, setActiveTab] = useState('discover');
-
-  // Network State
   const [discover, setDiscover] = useState([]);
   const [connections, setConnections] = useState([]);
   const [pending, setPending] = useState({ received: [], sent: [] });
-
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -18,12 +21,11 @@ export const PeersNetwork = () => {
       try {
         const res = await fetch('http://localhost:5000/api/network', { credentials: 'include' });
         const data = await res.json();
-
         setDiscover(data.discover || []);
         setConnections(data.connections || []);
         setPending(data.pending || { received: [], sent: [] });
       } catch (error) {
-        console.error("Failed to load network", error);
+        console.error('Failed to load network', error);
       } finally {
         setIsLoading(false);
       }
@@ -31,105 +33,81 @@ export const PeersNetwork = () => {
     fetchNetwork();
   }, []);
 
-
-
   const handleResponse = async (connectionId, action) => {
-    // 1. Find the specific request we are responding to
-    const requestToProcess = pending.received.find(req => req.connectionId === connectionId);
+    const requestToProcess = pending.received.find((req) => req.connectionId === connectionId);
     if (!requestToProcess) return;
 
-    // 2. Optimistic UI Update
-    // Remove it from the pending received list
-    setPending(prev => ({
-      ...prev,
-      received: prev.received.filter(req => req.connectionId !== connectionId)
-    }));
+    setPending((prev) => ({ ...prev, received: prev.received.filter((req) => req.connectionId !== connectionId) }));
 
-    // If accepted, immediately push it to the "My Connections" tab
     if (action === 'Accepted') {
-      setConnections(prev => [requestToProcess, ...prev]);
+      setConnections((prev) => [requestToProcess, ...prev]);
     } else if (action === 'Declined') {
-      //Instantly put the user back into the Discover pool!
-      setDiscover(prev => [requestToProcess.peer, ...prev]);
+      setDiscover((prev) => [requestToProcess.peer, ...prev]);
     }
 
-    // 3. Network Call
     try {
       const res = await fetch('http://localhost:5000/api/network/respond', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify({ connectionId, action })
+        body: JSON.stringify({ connectionId, action }),
       });
-
-      if (!res.ok) throw new Error("Failed to update status");
-
+      if (!res.ok) throw new Error('Failed to update status');
     } catch (error) {
-      console.error("Action failed, reverting UI...", error);
-      // If it fails, revert the UI by putting them back in the pending list
-      if (action === 'Accepted') {
-        setConnections(prev => prev.filter(conn => conn.connectionId !== connectionId));
-      } else if (action === 'Declined') {
-        setDiscover(prev => prev.filter(peer => peer._id !== requestToProcess.peer._id));
-      }
-      setPending(prev => ({
-        ...prev,
-        received: [requestToProcess, ...prev.received]
-      }));
+      console.error('Action failed, reverting UI…', error);
+      if (action === 'Accepted') setConnections((prev) => prev.filter((conn) => conn.connectionId !== connectionId));
+      else if (action === 'Declined') setDiscover((prev) => prev.filter((peer) => peer._id !== requestToProcess.peer._id));
+      setPending((prev) => ({ ...prev, received: [requestToProcess, ...prev.received] }));
     }
   };
 
-  // --- Optimistic Actions ---
   const handleConnect = async (peer) => {
     const peerId = peer._id;
-
-    // 1. Optimistically change button in Discover to "Pending"
-    setDiscover(prev => prev.map(p => p._id === peerId ? { ...p, localPending: true } : p));
-
+    setDiscover((prev) => prev.map((p) => (p._id === peerId ? { ...p, localPending: true } : p)));
     try {
       const res = await fetch('http://localhost:5000/api/connect', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify({ to: peerId })
+        body: JSON.stringify({ to: peerId }),
       });
       const newConn = await res.json();
-
-      // 2. Add to Sent Requests tab immediately
-      setPending(prev => ({
-        ...prev,
-        sent: [{ connectionId: newConn._id, peer: newConn.to }, ...prev.sent]
-      }));
+      setPending((prev) => ({ ...prev, sent: [{ connectionId: newConn._id, peer: newConn.to }, ...prev.sent] }));
     } catch (error) {
-      // Revert Discover UI on failure
-      setDiscover(prev => prev.map(p => p._id === peerId ? { ...p, localPending: false } : p));
+      setDiscover((prev) => prev.map((p) => (p._id === peerId ? { ...p, localPending: false } : p)));
     }
   };
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8 min-h-screen">
-      <div className="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
+
+      {/* Header */}
+      <div className="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-5">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-gray-900">Peer Network</h1>
-          <p className="text-sm text-gray-500 mt-1">Connect, challenge, and grow with other developers.</p>
+          <div className="flex items-center gap-2.5 mb-1">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-50">
+              <svg className="h-4 w-4 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+            </div>
+            <h1 className="text-xl font-bold text-gray-900">Peer Network</h1>
+          </div>
+          <p className="text-sm text-gray-500 pl-10">Connect, challenge, and grow with other learners.</p>
         </div>
 
         {/* Tab Switcher */}
-        <div className="flex space-x-1 rounded-xl bg-gray-100 p-1">
-          {[
-            { id: 'discover', label: 'Discover' },
-            { id: 'connections', label: 'My Peers' },
-            { id: 'pending', label: 'Pending Requests' }
-          ].map((tab) => (
+        <div className="flex gap-1 bg-gray-100 p-1 rounded-xl">
+          {tabs.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`rounded-lg px-4 py-1.5 text-sm font-medium transition-all ${activeTab === tab.id ? 'bg-white text-orange-600 shadow-sm' : 'text-gray-600 hover:text-gray-900'
-                }`}
+              className={`relative rounded-lg px-4 py-2 text-sm font-semibold transition-all duration-150 focus:outline-none ${
+                activeTab === tab.id ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'
+              }`}
             >
               {tab.label}
               {tab.id === 'pending' && pending.received.length > 0 && (
-                <span className="ml-2 rounded-full bg-red-500 px-2 py-0.5 text-[10px] text-white">
+                <span className="ml-1.5 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white">
                   {pending.received.length}
                 </span>
               )}
@@ -138,10 +116,15 @@ export const PeersNetwork = () => {
         </div>
       </div>
 
+      {/* Content */}
       {isLoading ? (
-        <div className="flex justify-center py-20"><p className="text-gray-500">Loading network...</p></div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="h-52 rounded-2xl bg-white animate-pulse ring-1 ring-gray-200" />
+          ))}
+        </div>
       ) : (
-        <div className="animate-in fade-in duration-300">
+        <div>
           {activeTab === 'discover' && <DiscoverPeers peers={discover} onConnect={handleConnect} />}
           {activeTab === 'connections' && <MyConnections connections={connections} />}
           {activeTab === 'pending' && <PendingRequests pending={pending} onResponse={handleResponse} />}
