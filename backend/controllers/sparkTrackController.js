@@ -1,8 +1,17 @@
 const SparkTrack = require('../models/SparkTrack');
-const { GoogleGenerativeAI } = require("@google/generative-ai");
 
-// Initialize the Gemini SDK
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+let GoogleGenerativeAI;
+let genAI;
+
+try {
+    const generativeAI = require("@google/generative-ai");
+    GoogleGenerativeAI = generativeAI.GoogleGenerativeAI;
+    if (process.env.GEMINI_API_KEY) {
+        genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+    }
+} catch (error) {
+    console.error("WARNING: @google/generative-ai module is not installed. AI features will be disabled.", error.message);
+}
 
 /**
  * @desc    Generate a new personalized learning Spark Track using AI
@@ -11,7 +20,19 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
  */
 const generateSparkTrack = async (req, res) => {
     try {
-
+        if (!GoogleGenerativeAI) {
+            return res.status(500).json({ 
+                error: "AI features are currently unavailable (missing '@google/generative-ai' library). Please check container logs and rebuild." 
+            });
+        }
+        if (!process.env.GEMINI_API_KEY) {
+            return res.status(500).json({ 
+                error: "GEMINI_API_KEY is not configured in the backend environment." 
+            });
+        }
+        if (!genAI) {
+            genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+        }
 
         const activeTracks = await SparkTrack.find({
             userId: req.user.id,

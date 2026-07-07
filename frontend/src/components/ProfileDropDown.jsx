@@ -4,114 +4,82 @@ import { useUser } from '../context/UserContext';
 export const ProfileDropdown = () => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
-
-  // Tap into the global context
   const { userProfileData, setUserProfileData } = useUser();
 
-  // --- Click Outside to Close Logic ---
   useEffect(() => {
     const handleClickOutside = (event) => {
-      // If the dropdown is open AND the click is outside the dropdown element, close it
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setIsOpen(false);
       }
     };
-
     document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
   const onLogout = async () => {
     try {
       const response = await fetch('http://localhost:5000/api/logout', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        credentials: 'include'
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
       });
-
-      if (!response.ok) {
-        throw new Error('Logout request failed');
-      }
-
-      const data = await response.json();
-
-      if (setUserProfileData) {
-        setUserProfileData(null);
-      }
-
-      // Redirect on success
+      if (!response.ok) throw new Error('Logout request failed');
+      if (setUserProfileData) setUserProfileData(null);
       window.location.href = '/login';
-      return data;
-
     } catch (error) {
       console.error('Error during logout:', error);
     }
+  };
 
-  }
-
-  // Safe fallback if data hasn't loaded yet (prevents crashes or blank avatars)
   if (!userProfileData) return null;
 
   return (
-    <div className="relative inline-block text-left" ref={dropdownRef}>
-
-      {/* Trigger Button */}
+    <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 rounded-full p-0.5 transition-all"
+        className="flex items-center gap-2 rounded-full focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 transition-all p-0.5"
         aria-expanded={isOpen}
         aria-haspopup="true"
       >
         <img
-          className="h-8 w-8 sm:h-9 sm:w-9 rounded-full object-cover shadow-sm ring-1 ring-gray-200"
+          className="h-8 w-8 rounded-full object-cover ring-2 ring-gray-200 hover:ring-orange-300 transition-all"
           src={userProfileData.avatarUrl}
-          alt={`${userProfileData.name}'s profile`}
+          alt={userProfileData.profileName}
         />
       </button>
 
-      {/* The Popup Menu */}
       {isOpen && (
-        <div className="absolute right-0 mt-3 w-80 origin-top-right rounded-2xl bg-white shadow-2xl ring-1 ring-black/5 focus:outline-none z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+        <div className="absolute right-0 mt-2 w-72 origin-top-right rounded-2xl bg-white shadow-modal ring-1 ring-black/5 focus:outline-none z-50 overflow-hidden">
 
-          {/* User Info Header */}
+          {/* User Header */}
           <div className="p-4 border-b border-gray-100">
-            <div className="flex items-start gap-3">
+            <div className="flex items-center gap-3">
               <img
-                className="h-14 w-14 rounded-full object-cover shadow-sm ring-1 ring-gray-200"
+                className="h-12 w-12 rounded-full object-cover ring-2 ring-gray-100 flex-shrink-0"
                 src={userProfileData.avatarUrl}
                 alt=""
               />
               <div className="flex-1 min-w-0">
-                <h3 className="text-base font-bold text-gray-900 truncate">
-                  {userProfileData.profileName}
-                </h3>
-                <h2 className="text-lg font bold text-gray-900 leading-tight truncate">
-                  {userProfileData.organization}
-                </h2>
-                <p className="text-xs text-gray-600 mt-1 line-clamp-3 leading-snug">
+                <h3 className="text-sm font-bold text-gray-900 truncate">{userProfileData.profileName}</h3>
+                <p className="text-xs text-gray-500 truncate mt-0.5">{userProfileData.organization}</p>
+                <span className="mt-1 inline-flex items-center rounded-full bg-orange-50 px-2 py-0.5 text-xs font-semibold text-orange-700">
                   {userProfileData.role}
-                </p>
+                </span>
               </div>
             </div>
+          </div>
 
-            {/* Sign Out Section */}
-            <div className="py-1 mt-4">
-              <button
-                className="w-full text-left px-4 py-3 text-sm text-gray-600 hover:bg-gray-50 hover:text-red-600 transition-colors rounded-b-2xl font-medium"
-                onClick={() => {
-                  console.log("Signing out...");
-                  onLogout();
-
-                }}
-              >
-                Sign out
-              </button>
-            </div>
-
+          {/* Actions */}
+          <div className="p-1.5">
+            <button
+              className="w-full flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50 transition-colors"
+              onClick={onLogout}
+            >
+              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+              </svg>
+              Sign out
+            </button>
           </div>
         </div>
       )}
